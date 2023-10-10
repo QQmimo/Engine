@@ -37,11 +37,11 @@ export class EngineElement {
                 this.X += Math.round((Math.cos(angle) * speed + Number.EPSILON) * 10) / 10;
                 this.Y += Math.round((Math.sin(angle) * speed + Number.EPSILON) * 10) / 10;
 
-                if (Math.floor(this.X) === targetX) {
+                if (Math.abs(Math.floor(this.X) - targetX) <= speed) {
                     this.X = targetX;
                 }
 
-                if (Math.floor(this.Y) === targetY) {
+                if (Math.abs(Math.floor(this.Y) - targetY) <= speed) {
                     this.Y = targetY;
                 }
 
