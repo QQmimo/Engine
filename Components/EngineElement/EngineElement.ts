@@ -45,8 +45,6 @@ export class EngineElement {
                     this.Y = targetY;
                 }
 
-                //console.log(`target: (${targetX}; ${targetY}) | obj: (${this.X}; ${this.Y})`);
-
                 if (this.X === targetX && this.Y === targetY) {
                     resolve();
                 }
