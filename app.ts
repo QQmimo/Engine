@@ -17,15 +17,16 @@ let moving: boolean = false;
 world.Canvas.addEventListener('click', (e) => {
     if (moving === false) {
         moving = true;
+        const speed: number = 5;
         const dot: EngineElement = new EngineElement(EnumGeometry.Circle, e.offsetX, e.offsetY, 5);
         dot.setBackground(EnumColor.Red);
         world.addElement(dot);
         const startX: number = circle.X;
         const startY: number = circle.Y;
-        circle.moveTo(dot.X, dot.Y).then(() => {
+        circle.moveTo(dot.X, dot.Y, speed).then(() => {
             world.removeElement(dot);
         }).then(() => {
-            circle.moveTo(startX, startY).then(() => {
+            circle.moveTo(startX, startY, speed).then(() => {
                 moving = false;
             });
         });
