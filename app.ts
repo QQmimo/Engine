@@ -12,24 +12,29 @@ circle.setBackground(EnumColor.Red, 0.25);
 world.addElement(cube);
 world.addElement(circle);
 
-let moving: boolean = false;
+let path: { x: number, y: number, dot: EngineElement }[] = [];
+let index: number = 0;
 
-world.Canvas.addEventListener('click', (e) => {
-    if (moving === false) {
-        moving = true;
-        const speed: number = 5;
-        const dot: EngineElement = new EngineElement(EnumGeometry.Circle, e.offsetX, e.offsetY, 5);
-        dot.setBackground(EnumColor.Red);
-        world.addElement(dot);
-        const startX: number = circle.X;
-        const startY: number = circle.Y;
-        circle.moveTo(dot.X, dot.Y, speed).then(() => {
-            world.removeElement(dot);
-        }).then(() => {
-            circle.moveTo(startX, startY, speed).then(() => {
-                moving = false;
-            });
-        });
+let start = (target: { x: number, y: number, dot: EngineElement }, speed: number): void => {
+    circle.moveTo(target.x, target.y, speed).then(() => {
+        target.dot.setBackground(EnumColor.Green);
+        index++;
+
+        if (path[index]) {
+            start(path[index], speed);
+        }
+    });
+}
+
+world.Canvas.addEventListener('click', async (e) => {
+    const dot: EngineElement = new EngineElement(EnumGeometry.Circle, e.offsetX, e.offsetY, 5);
+    dot.setBackground(EnumColor.Red);
+    path.push({ x: e.offsetX, y: e.offsetY, dot: dot });
+    world.addElement(dot);
+    const speed: number = 1;
+
+    if (path.length === 1) {
+        start(path[0], speed);
     }
 });
 
