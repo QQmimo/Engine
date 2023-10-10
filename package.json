@@ -1,0 +1,21 @@
+{
+  "name": "engine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/engine.js",
+  "scripts": {
+    "dev": "webpack --mode=development",
+    "watch:dev": "webpack --watch --mode=development",
+    "build": "webpack --mode=production",
+    "test": "npm run dev & node ./dist/engine.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "html-loader": "^4.2.0",
+    "html-webpack-plugin": "^5.5.3",
+    "ts-loader": "^9.4.4",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  }
+}
