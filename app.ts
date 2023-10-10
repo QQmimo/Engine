@@ -27,7 +27,6 @@ let start = (target: { x: number, y: number, dot: EngineElement }, speed: number
             path = [];
             index = 0;
         }
-        console.log(path);
     });
 }
 
