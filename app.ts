@@ -17,12 +17,17 @@ let index: number = 0;
 
 let start = (target: { x: number, y: number, dot: EngineElement }, speed: number): void => {
     circle.moveTo(target.x, target.y, speed).then(() => {
-        target.dot.setBackground(EnumColor.Green);
+        world.removeElement(target.dot);
         index++;
 
         if (path[index]) {
             start(path[index], speed);
         }
+        else {
+            path = [];
+            index = 0;
+        }
+        console.log(path);
     });
 }
 
