@@ -1,3 +1,4 @@
+import { RecycleBin } from "../../Utilities";
 import { Component, Transform } from "./Components";
 
 export class GameObject {
@@ -52,10 +53,12 @@ export class GameObject {
             });
     }
 
-    public addTag = (tag: string): void => {
-        if (!this.compareTag(tag)) {
-            this.Tags.push(tag);
-        }
+    public addTags = (...tags: string[]): void => {
+        tags.forEach(tag => {
+            if (!this.compareTag(tag)) {
+                this.Tags.push(tag);
+            }
+        });
     }
 
     public compareTag = (tag: string): boolean => {
@@ -63,26 +66,34 @@ export class GameObject {
     }
 
     public destroy = (): void => {
-        Object.keys(this).forEach(key => {
-            delete this[key];
-        })
+        GameObject.destroy(this.Name);
+        RecycleBin.destroy(this);
     }
 
 
     protected static GameObjects: GameObject[] = [];
+
     public static add = (gameObject: GameObject): void => {
         if (GameObject.find(gameObject.Name)) {
             throw new Error(`ОШИБКА: GameObject с именем '${gameObject.Name}' уже существует.`);
         }
         this.GameObjects.push(gameObject);
     }
+
     public static find = (name: string): GameObject => {
         return this.GameObjects.find(gameObject => gameObject.Name === name);
     }
+
+    public static findByTag = (tag: string): GameObject[] => {
+        return this.GameObjects.filter(gameObject => gameObject.compareTag(tag));
+    }
+
     public static destroy = (name: string): void => {
         const index: number = this.GameObjects.map(gameObject => gameObject.Name).indexOf(name);
-        this.GameObjects[index].destroy();
-        delete this.GameObjects[index];
-        this.GameObjects = this.GameObjects.filter(gameObject => gameObject !== undefined);
+        if (index !== -1) {
+            RecycleBin.destroy(this.GameObjects[index]);
+            delete this.GameObjects[index];
+            this.GameObjects = this.GameObjects.filter(gameObject => gameObject !== undefined);
+        }
     }
 }

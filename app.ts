@@ -1,10 +1,12 @@
 import { GameObject } from "./GameEngine";
 import { Component1, Component2 } from "./GameEngine/GameObject/Components/Component";
 
-const go: GameObject = new GameObject('Test', Component1, Component2);
+const obj1: GameObject = new GameObject('Test', Component1, Component2);
+obj1.addTags('Component', 'Some');
 
-go.broadcastMessage('logger', 10);
+const obj2: GameObject = new GameObject('Test2');
+obj2.addTags('Some');
 
-GameObject.destroy('Test');
+const obj3: GameObject = new GameObject('Test3');
 
-console.log(GameObject);
+console.log(GameObject.findByTag('Some'));
