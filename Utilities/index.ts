@@ -1,4 +1,4 @@
-export { EnumColor, TypeColor } from './EngineColor';
-export { Guid } from './EngineGuid/Guid';
-export { Random } from './EngineRandom/Random';
-export { EnumGeometry } from './EngineGeometry/EnumGeometry';
+export * from './Color';
+export { Guid } from './Guid/Guid';
+export { Random } from './Random/Random';
+export { Point } from './Point/Point';
