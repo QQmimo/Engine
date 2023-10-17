@@ -14,25 +14,34 @@ export class GameObject {
         });
     }
 
-    public Name: string;
+    public set Name(value: string) {
+        if (GameObject.find(value)) {
+            throw new Error(`ОШИБКА: GameObject с именем '${value}' уже существует.`);
+        }
+        this._Name = value;
+    };
+    public get Name(): string {
+        return this._Name;
+    }
     public IsHidden: boolean;
     public Transform: Transform;
     protected Components: Component[];
     protected Tags: string[];
+    private _Name: string;
 
-    public addComponent = <T extends Component>(type: { new(): T }): T => {
-        const component: T = new type();
+    public addComponent = <T extends Component>(type: { new(gameObject: GameObject): T }): T => {
+        const component: T = new type(this);
         this.Components.push(component);
         return component;
     }
 
-    public getComponent = <T extends Component>(type: { new(): T }): T => {
-        const target: T = new type();
+    public getComponent = <T extends Component>(type: { new(gameObject: GameObject): T }): T => {
+        const target: T = new type(undefined);
         return this.Components.find(component => component.constructor.name === target.constructor.name) as T;
     }
 
-    public detachComponent = <T extends Component>(type: { new(): T }): void => {
-        const target: T = new type();
+    public detachComponent = <T extends Component>(type: { new(gameObject: GameObject): T }): void => {
+        const target: T = new type(undefined);
         this.Components = this.Components.filter(component => component.constructor.name !== target.constructor.name);
     }
 
