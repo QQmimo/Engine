@@ -1,10 +1,13 @@
 import { Angle } from "../../../Utilities";
+import { GameObject } from "../GameObject";
 
 export class Rotation {
-    constructor(angle: Angle = new Angle(0)) {
-        this._Angle = angle;
+    constructor(gameObject: GameObject) {
+        this._Angle = new Angle(0);
+        this.GameObject = gameObject;
     }
 
+    protected GameObject: GameObject;
     private _Angle: Angle;
 
     public setAsDegree = (degree: number): void => {

@@ -1,19 +1,28 @@
-import { GameObject } from "./GameEngine";
-import { Component1, Component2 } from "./GameEngine/GameObject/Components/Component";
-import { Angle } from "./Utilities";
+import { GameScreen, GameLayer, GameObject, Shape } from "./GameEngine";
 
-const obj1: GameObject = new GameObject('Test', Component1, Component2);
-obj1.addTags('Component', 'Some');
+const screen: GameScreen = new GameScreen(document.body, 800, 600);
+const world: GameLayer = screen.addLayer('world');
 
-const obj2: GameObject = new GameObject('Test2');
-obj2.addTags('Some');
+const circleRed: GameObject = new GameObject('red', Shape);
+circleRed.Transform.Position = { X: 150, Y: 150 };
+const circleRedRenderer: Shape = circleRed.getComponent(Shape);
+circleRedRenderer?.setBackground('red');
+circleRedRenderer?.setStroke(1, 'black');
+circleRedRenderer?.draw({ X: -25, Y: -25 }, { X: 25, Y: -25 }, { X: 25, Y: 25 }, { X: -25, Y: 25 });
+world.addObject(circleRed);
 
-const obj3: GameObject = new GameObject('Test3');
+setInterval(() => {
+    let degree: number = circleRed.Transform.Rotation.getAsDegree();
+    circleRed.Transform.Rotation.setAsDegree((degree >= 360 ? 0 : degree) + 1);
+}, 100);
 
+let bodyW: number = 0;
+let bodyH: number = 0;
+function resize() {
+    bodyW = screen.Canvas.width = innerWidth;
+    bodyH = screen.Canvas.height = innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
 
-console.log(GameObject.findByTag('Some'));
-
-console.log(new Angle(100).getAsRadian());
-
-console.log(obj3.Transform.Rotation.getAsDegree());
-console.log(obj3.Transform.Rotation.getAsRadian());
+screen.runLoop();

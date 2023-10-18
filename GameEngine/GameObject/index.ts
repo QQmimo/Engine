@@ -1,2 +1,2 @@
 export { GameObject } from './GameObject';
-export * from './Components';
+export * from './Properties';
