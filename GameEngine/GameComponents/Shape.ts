@@ -1,4 +1,4 @@
-import { Angle } from "../../Utilities";
+import { Angle, Round } from "../../Utilities";
 import { Component, Position } from "../GameObject";
 
 export class Shape extends Component {
@@ -8,6 +8,7 @@ export class Shape extends Component {
     private _BackgroundColor: string;
     private _Opacity: number = 1;
     private _Dots: Position[] = [];
+    private _Angle: Angle = new Angle(0);
 
     public drawByDots = (...dots: Position[]): void => {
         this._Dots = dots;
@@ -96,15 +97,16 @@ export class Shape extends Component {
     }
 
     private _rotate = (): void => {
-        if (this.GameObject.Layer) {
-            const angle: number = this.GameObject.Transform.Rotation.getAsRadian();
+        //FIXME: Поломал вращение
+        if (this.GameObject.Layer && Math.round(this._Angle.getAsDegree()) !== Math.round(this.GameObject.Transform.Rotation.getAsDegree())) {
+            this._Angle = new Angle(this.GameObject.Transform.Rotation.getAsDegree());
             this._Dots.forEach(dot => {
                 const CX: number = this.GameObject.Transform.Position.X;
                 const CY: number = this.GameObject.Transform.Position.Y;
                 const X: number = dot.X + CX;
                 const Y: number = dot.Y + CY;
-                const cos: number = Math.cos(angle);
-                const sin: number = Math.sin(angle);
+                const cos: number = Math.cos(this._Angle.getAsRadian());
+                const sin: number = Math.sin(this._Angle.getAsRadian());
                 dot.X = (cos * (X - CX)) + (sin * (Y - CY));
                 dot.Y = (cos * (Y - CY)) - (sin * (X - CX));
             });

@@ -18,7 +18,9 @@ module.exports = {
             }
         ],
     },
-    plugins: [new HtmlWebpackPlugin()],
+    plugins: [new HtmlWebpackPlugin({
+        title: 'Engine'
+    })],
     resolve: {
         extensions: ['.ts', '.json', '.js', '.html']
     }

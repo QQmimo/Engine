@@ -7,10 +7,9 @@ export class GameScreen extends BaseObject {
         this.Layers = [];
         this.Canvas = document.createElement('canvas');
         if (width === undefined || height === undefined || width === null || height === null) {
+            this._resizeCanvas();
             window.addEventListener("resize", (e) => {
-                this.Canvas.width = innerWidth;
-                this.Canvas.height = innerHeight;
-                this.Canvas.style.cssText = 'position: absolute; top: 0; left: 0;';
+                this._resizeCanvas();
             });
         }
         else {
@@ -22,6 +21,13 @@ export class GameScreen extends BaseObject {
 
     public Canvas: HTMLCanvasElement;
     protected Layers: GameLayer[];
+
+
+    private _resizeCanvas = (): void => {
+        this.Canvas.width = innerWidth;
+        this.Canvas.height = innerHeight;
+        this.Canvas.style.cssText = 'position: absolute; top: 0; left: 0;';
+    }
 
     public addLayer = (name: string): GameLayer => {
         const layer: GameLayer = new GameLayer(name, this);
