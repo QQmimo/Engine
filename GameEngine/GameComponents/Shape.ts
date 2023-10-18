@@ -91,8 +91,8 @@ export class Shape extends Component {
     public update = (): void => {
         if (this._drawAction) {
             this._drawAction();
+            this._rotate();
         }
-        this._rotate();
     }
 
     private _rotate = (): void => {

@@ -2,13 +2,21 @@ import { BaseObject } from "../BaseObject";
 import { GameLayer } from "../GameLayer";
 
 export class GameScreen extends BaseObject {
-    constructor(target: HTMLElement, width: number, height: number) {
+    constructor(target: HTMLElement, width?: number, height?: number) {
         super('GameScreen');
         this.Layers = [];
         this.Canvas = document.createElement('canvas');
-        this.Canvas.width = width;
-        this.Canvas.height = height;
-        this.Canvas.style.cssText = 'position: absolute; left: 0; top: 0;';
+        if (width === undefined || height === undefined || width === null || height === null) {
+            window.addEventListener("resize", (e) => {
+                this.Canvas.width = innerWidth;
+                this.Canvas.height = innerHeight;
+                this.Canvas.style.cssText = 'position: absolute; top: 0; left: 0;';
+            });
+        }
+        else {
+            this.Canvas.width = width;
+            this.Canvas.height = height;
+        }
         target.appendChild(this.Canvas);
     }
 
