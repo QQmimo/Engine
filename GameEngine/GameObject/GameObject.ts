@@ -27,7 +27,11 @@ export class GameObject extends BaseObject {
 
     public getComponent = <T extends Component>(type: { new(gameObject: GameObject): T }): T => {
         const target: T = new type(undefined);
-        return this.Components.find(component => component.constructor.name === target.constructor.name) as T;
+        const found: T = this.Components.find(component => component.constructor.name === target.constructor.name) as T;
+        if (!found) {
+            throw new Error(`ОШИБКА: Компонент '${target.constructor.name}' не найден.`);
+        }
+        return found;
     }
 
     public detachComponent = <T extends Component>(type: { new(gameObject: GameObject): T }): void => {
