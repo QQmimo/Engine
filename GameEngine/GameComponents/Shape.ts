@@ -1,3 +1,4 @@
+import { Angle } from "../../Utilities";
 import { Component, Position } from "../GameObject";
 
 export class Shape extends Component {
@@ -8,7 +9,7 @@ export class Shape extends Component {
     private _Opacity: number = 1;
     private _Dots: Position[] = [];
 
-    public draw = (...dots: Position[]): void => {
+    public drawByDots = (...dots: Position[]): void => {
         this._Dots = dots;
         this._drawAction = (): void => {
             if (this.GameObject.Layer && !this.GameObject.IsHidden) {
@@ -51,7 +52,27 @@ export class Shape extends Component {
         this.update();
     }
 
-    public setStroke = (width: number, color: string): void => {
+    public drawByDotsCount = (count: number, distance: number): void => {
+        const dots: Position[] = [];
+        for (let i: number = 0; i < count; i++) {
+            const angle: number = new Angle(360 / count).getAsRadian() * i;
+            const CX: number = this.GameObject.Transform.Position.X;
+            const CY: number = this.GameObject.Transform.Position.Y;
+            const X: number = CX + distance;
+            const Y: number = CY;
+            const cos: number = Math.cos(angle);
+            const sin: number = Math.sin(angle);
+
+            dots.push({
+                X: (cos * (X - CX)) + (sin * (Y - CY)),
+                Y: (cos * (Y - CY)) - (sin * (X - CX))
+            });
+        }
+
+        this.drawByDots(...dots);
+    }
+
+    public setStroke = (width: number, color: string = 'black'): void => {
         this._StrokeWidth = width;
         this._StrokeColor = color;
         this.update();
