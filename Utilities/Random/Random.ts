@@ -6,4 +6,8 @@ export class Random {
     public static Float = (from: number = 0, to: number = 1): number => {
         return Math.random() * (to - from) + from;
     }
+
+    public static Color = (): string => {
+        return `rgb(${Random.Integer(0, 255)}, ${Random.Integer(0, 255)}, ${Random.Integer(0, 255)})`;
+    }
 }

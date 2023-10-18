@@ -1,11 +1,11 @@
 import { GameObject } from "../GameObject";
 
-export class Component {
+export abstract class Component {
     constructor(gameObject: GameObject) {
         this.GameObject = gameObject;
     }
 
     protected GameObject: GameObject;
 
-    public update = (): void  => {}
+    public update?: () => void;
 }

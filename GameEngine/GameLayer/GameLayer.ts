@@ -6,12 +6,13 @@ export class GameLayer extends BaseObject {
     constructor(name: string, screen: GameScreen) {
         super(name);
         this.Screen = screen;
+        //FIXME: Нужно сделать очередь отрисовки на основе слоя
         this.Context = this.Screen.Canvas.getContext('2d');
         this.GameObjects = [];
     }
 
     private _Order: number;
-    protected Screen: GameScreen;
+    protected readonly Screen: GameScreen;
     public readonly Context: CanvasRenderingContext2D;
     public GameObjects: GameObject[];
     public set Order(value: number) {
