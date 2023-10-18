@@ -2,25 +2,43 @@ import { Component } from "../GameObject";
 
 export class Image extends Component {
     private _drawAction: Function;
-    private _strokeWidth: number;
-    private _strokeColor: string;
-    private _backgroundColor: string;
+    private _StrokeWidth: number;
+    private _StrokeColor: string;
+    private _BackgroundColor: string;
+    private _Opacity: number = 1;
+
     public draw = (): void => {
         this._drawAction = (): void => {
-            
+            if (this.GameObject.Layer && !this.GameObject.IsHidden) {
+                this.GameObject.Layer.Context.beginPath();
+                this.GameObject.Layer.Context.globalAlpha = this._Opacity;
+
+                //FIXME: Добавить отрисовку картинки
+
+                if (this._StrokeColor) {
+                    this.GameObject.Layer.Context.strokeStyle = this._StrokeColor;
+                    this.GameObject.Layer.Context.lineWidth = this._StrokeWidth;
+                    this.GameObject.Layer.Context.stroke();
+                }
+                if (this._BackgroundColor) {
+                    this.GameObject.Layer.Context.fillStyle = this._BackgroundColor;
+                    this.GameObject.Layer.Context.fill();
+                }
+                this.GameObject.Layer.Context.closePath();
+            }
         }
 
         this.update();
     }
 
     public setStroke = (width: number, color: string): void => {
-        this._strokeWidth = width;
-        this._strokeColor = color;
+        this._StrokeWidth = width;
+        this._StrokeColor = color;
         this.update();
     }
 
     public setBackground = (color: string): void => {
-        this._backgroundColor = color;
+        this._BackgroundColor = color;
         this.update();
     }
 
@@ -34,7 +52,7 @@ export class Image extends Component {
     private _rotate = (): void => {
         if (this.GameObject.Layer) {
             const angle: number = this.GameObject.Transform.Rotation.getAsRadian();
-            
+            //FIXME: Добавить вращение картинки
         }
     }
 }
