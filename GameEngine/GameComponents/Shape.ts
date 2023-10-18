@@ -2,17 +2,19 @@ import { Component, Position } from "../GameObject";
 
 export class Shape extends Component {
     private _drawAction: Function;
-    private _strokeWidth: number;
-    private _strokeColor: string;
-    private _backgroundColor: string;
-    private _dots: Position[] = [];
+    private _StrokeWidth: number;
+    private _StrokeColor: string;
+    private _BackgroundColor: string;
+    private _Opacity: number = 1;
+    private _Dots: Position[] = [];
 
     public draw = (...dots: Position[]): void => {
-        this._dots = dots;
+        this._Dots = dots;
         this._drawAction = (): void => {
-            if (this.GameObject.Layer) {
+            if (this.GameObject.Layer && !this.GameObject.IsHidden) {
                 this.GameObject.Layer.Context.beginPath();
-                this._dots.forEach((dot, index, self) => {
+                this.GameObject.Layer.Context.globalAlpha = this._Opacity;
+                this._Dots.forEach((dot, index, self) => {
                     if (index === 0) {
                         this.GameObject.Layer.Context.moveTo(
                             dot.X + this.GameObject.Transform.Position.X,
@@ -33,13 +35,13 @@ export class Shape extends Component {
                         );
                     }
                 });
-                if (this._strokeColor) {
-                    this.GameObject.Layer.Context.strokeStyle = this._strokeColor;
-                    this.GameObject.Layer.Context.lineWidth = this._strokeWidth;
+                if (this._StrokeColor) {
+                    this.GameObject.Layer.Context.strokeStyle = this._StrokeColor;
+                    this.GameObject.Layer.Context.lineWidth = this._StrokeWidth;
                     this.GameObject.Layer.Context.stroke();
                 }
-                if (this._backgroundColor) {
-                    this.GameObject.Layer.Context.fillStyle = this._backgroundColor;
+                if (this._BackgroundColor) {
+                    this.GameObject.Layer.Context.fillStyle = this._BackgroundColor;
                     this.GameObject.Layer.Context.fill();
                 }
                 this.GameObject.Layer.Context.closePath();
@@ -50,13 +52,18 @@ export class Shape extends Component {
     }
 
     public setStroke = (width: number, color: string): void => {
-        this._strokeWidth = width;
-        this._strokeColor = color;
+        this._StrokeWidth = width;
+        this._StrokeColor = color;
         this.update();
     }
 
     public setBackground = (color: string): void => {
-        this._backgroundColor = color;
+        this._BackgroundColor = color;
+        this.update();
+    }
+
+    public setOpacity = (opacity: number = 1): void => {
+        this._Opacity = opacity;
         this.update();
     }
 
@@ -70,7 +77,7 @@ export class Shape extends Component {
     private _rotate = (): void => {
         if (this.GameObject.Layer) {
             const angle: number = this.GameObject.Transform.Rotation.getAsRadian();
-            this._dots.forEach(dot => {
+            this._Dots.forEach(dot => {
                 const CX: number = this.GameObject.Transform.Position.X;
                 const CY: number = this.GameObject.Transform.Position.Y;
                 const X: number = dot.X + CX;
