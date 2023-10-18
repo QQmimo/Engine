@@ -70,12 +70,16 @@ export class Shape extends Component {
     private _rotate = (): void => {
         if (this.GameObject.Layer) {
             const angle: number = this.GameObject.Transform.Rotation.getAsRadian();
-
             this._dots.forEach(dot => {
-                dot.X = (Math.cos(angle) * (dot.X - this.GameObject.Transform.Position.X)) + (Math.sin(angle) * (dot.Y - this.GameObject.Transform.Position.Y)) + this.GameObject.Transform.Position.X;
-                dot.Y = (Math.cos(angle) * (dot.Y - this.GameObject.Transform.Position.Y)) + (Math.sin(angle) * (dot.X - this.GameObject.Transform.Position.X)) + this.GameObject.Transform.Position.Y;
+                const CX: number = this.GameObject.Transform.Position.X;
+                const CY: number = this.GameObject.Transform.Position.Y;
+                const X: number = dot.X + CX;
+                const Y: number = dot.Y + CY;
+                const cos: number = Math.cos(angle);
+                const sin: number = Math.sin(angle);
+                dot.X = (cos * (X - CX)) + (sin * (Y - CY));
+                dot.Y = (cos * (Y - CY)) - (sin * (X - CX));
             });
-            console.log(this.GameObject.Transform.Rotation.getAsRadian());
         }
     }
 }

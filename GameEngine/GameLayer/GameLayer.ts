@@ -24,7 +24,6 @@ export class GameLayer extends BaseObject {
 
     public addObject = (gameObject: GameObject): void => {
         gameObject.setLayer(this);
-        console.log(gameObject.Layer);
         this.GameObjects.push(gameObject);
     }
 
