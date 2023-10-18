@@ -21,6 +21,9 @@ cubeRedRenderer?.setStroke(1, 'black');
 cubeRedRenderer?.draw({ X: -25, Y: -25 }, { X: 25, Y: -25 }, { X: 25, Y: 25 }, { X: -25, Y: 25 });
 world.addObject(cubeRed);
 
+const cubeTest: GameObject = new GameObject('test', Shape);
+world.addObject(cubeTest);
+
 
 setInterval(() => {
     cubeRed.Transform.Rotation.setAsDegree(-1);
@@ -41,3 +44,6 @@ resize();
 window.addEventListener("resize", resize);
 
 screen.runLoop();
+
+
+console.log(GameObject.findAllWith(Shape));

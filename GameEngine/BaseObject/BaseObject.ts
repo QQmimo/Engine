@@ -1,4 +1,5 @@
 import { RecycleBin } from "../../Utilities";
+import { Component, GameObject } from "../GameObject";
 
 export class BaseObject {
     constructor(name: string) {
@@ -48,7 +49,7 @@ export class BaseObject {
     }
 
     public static find(name: string): BaseObject | undefined {
-        return this.BaseObjects.find(gameObject => gameObject.Name === name);
+        return this.BaseObjects.find(obj => obj.Name === name);
     }
 
     public static findByTag(tag: string): BaseObject[] {
@@ -56,11 +57,11 @@ export class BaseObject {
     }
 
     public static destroy(name: string): void {
-        const index: number = this.BaseObjects.filter(gameObject => this.name === gameObject.constructor.name).map(gameObject => gameObject.Name).indexOf(name);
+        const index: number = this.BaseObjects.filter(obj => this.name === obj.constructor.name).map(gameObject => gameObject.Name).indexOf(name);
         if (index !== -1) {
             RecycleBin.destroy(this.BaseObjects[index]);
             delete this.BaseObjects[index];
-            this.BaseObjects = this.BaseObjects.filter(gameObject => gameObject !== undefined);
+            this.BaseObjects = this.BaseObjects.filter(obj => obj !== undefined);
         }
     }
 }
