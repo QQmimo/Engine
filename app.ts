@@ -1,5 +1,4 @@
-import { GameScreen, GameLayer, GameObject, Shape } from "./GameEngine";
-import { Movable } from "./GameEngine/GameComponents/Movable";
+import { GameScreen, GameLayer, GameObject, Shape, Movable } from "./GameEngine";
 import { Random } from "./Utilities";
 
 const screen: GameScreen = new GameScreen(document.body);
