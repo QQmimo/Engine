@@ -59,9 +59,9 @@ export class GameObject extends BaseObject {
     public setLayer = (layer: GameLayer): void => {
         this.Layer = layer;
     }
+    
 
-
-    public static findAllWith(component: typeof Component): GameObject[] {
+    public static findAllWith<T extends Component>(component: { new(): T}): GameObject[] {
         return this.BaseObjects.filter(obj => obj instanceof GameObject && obj.getComponent(component) !== undefined) as GameObject[];
     }
 }

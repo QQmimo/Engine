@@ -1,6 +1,6 @@
 import { GameObject } from "../GameObject";
 
-export abstract class Component {
+export class Component {
     constructor(gameObject: GameObject) {
         this.GameObject = gameObject;
     }

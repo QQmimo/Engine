@@ -1,28 +1,30 @@
-import { Angle } from "../../../Utilities";
 import { GameObject } from "../GameObject";
+import { Position } from "./Position";
 
 export class Rotation {
     constructor(gameObject: GameObject) {
-        this._Angle = new Angle(0);
+        this.RadianAngle = 0;
         this.GameObject = gameObject;
     }
 
     protected GameObject: GameObject;
-    private _Angle: Angle;
-
-    public setAsDegree = (degree: number): void => {
-        this._Angle = new Angle(degree);
+    public RadianAngle: number;
+    public get DegreeAngle(): number {
+        return this.RadianAngle * 180 / Math.PI;
     }
 
-    public setAsRadian = (radian: number): void => {
-        this._Angle = new Angle(Angle.radianToDegree(radian));
+    public rotateByPoint = (point: Position): number => {
+        this.RadianAngle = -Math.atan2(point.Y - this.GameObject.Transform.Position.Y, point.X - this.GameObject.Transform.Position.X);
+        return this.RadianAngle;
     }
 
-    public getAsRadian = (): number => {
-        return this._Angle.getAsRadian();
+    public rotateByDegree = (degree: number): number => {
+        this.RadianAngle = degree * Math.PI / 180;
+        return this.RadianAngle;
     }
 
-    public getAsDegree = (): number => {
-        return this._Angle.getAsDegree();
+    public rotateByRadian = (radian: number): number => {
+        this.RadianAngle = radian;
+        return this.RadianAngle;
     }
 }

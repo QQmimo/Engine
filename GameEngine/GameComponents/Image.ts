@@ -51,7 +51,6 @@ export class Image extends Component {
 
     private _rotate = (): void => {
         if (this.GameObject.Layer) {
-            const angle: number = this.GameObject.Transform.Rotation.getAsRadian();
             //FIXME: Добавить вращение картинки
         }
     }

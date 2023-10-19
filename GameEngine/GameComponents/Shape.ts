@@ -1,4 +1,3 @@
-import { Angle, Round } from "../../Utilities";
 import { Component, Position } from "../GameObject";
 
 export class Shape extends Component {
@@ -8,7 +7,6 @@ export class Shape extends Component {
     private _BackgroundColor: string;
     private _Opacity: number = 1;
     private _Dots: Position[] = [];
-    private _Angle: Angle = new Angle(0);
 
     public drawByDots = (...dots: Position[]): void => {
         this._Dots = dots;
@@ -16,24 +14,34 @@ export class Shape extends Component {
             if (this.GameObject.Layer && !this.GameObject.IsHidden) {
                 this.GameObject.Layer.Context.beginPath();
                 this.GameObject.Layer.Context.globalAlpha = this._Opacity;
+                const centerX: number = this.GameObject.Transform.Position.X;
+                const centerY: number = this.GameObject.Transform.Position.Y;
+                const andle: number = this.GameObject.Transform.Rotation.RadianAngle;
                 this._Dots.forEach((dot, index, self) => {
+                    const dotX: number = dot.X + centerX;
+                    const dotY: number = dot.Y + centerY;
+                    const cos: number = Math.cos(andle);
+                    const sin: number = Math.sin(andle);
+
                     if (index === 0) {
                         this.GameObject.Layer.Context.moveTo(
-                            dot.X + this.GameObject.Transform.Position.X,
-                            dot.Y + this.GameObject.Transform.Position.Y
+                            (cos * (dotX - centerX)) + (sin * (dotY - centerY)) + centerX,
+                            (cos * (dotY - centerY)) - (sin * (dotX - centerX)) + centerY
                         );
                     }
                     else {
                         this.GameObject.Layer.Context.lineTo(
-                            dot.X + this.GameObject.Transform.Position.X,
-                            dot.Y + this.GameObject.Transform.Position.Y
+                            (cos * (dotX - centerX)) + (sin * (dotY - centerY)) + centerX,
+                            (cos * (dotY - centerY)) - (sin * (dotX - centerX)) + centerY
                         );
                     }
 
                     if (index === dots.length - 1) {
+                        const dotX: number = self[0].X + centerX;
+                        const dotY: number = self[0].Y + centerY;
                         this.GameObject.Layer.Context.lineTo(
-                            self[0].X + this.GameObject.Transform.Position.X,
-                            self[0].Y + this.GameObject.Transform.Position.Y
+                            (cos * (dotX - centerX)) + (sin * (dotY - centerY)) + centerX,
+                            (cos * (dotY - centerY)) - (sin * (dotX - centerX)) + centerY
                         );
                     }
                 });
@@ -56,7 +64,7 @@ export class Shape extends Component {
     public drawByDotsCount = (count: number, distance: number): void => {
         const dots: Position[] = [];
         for (let i: number = 0; i < count; i++) {
-            const angle: number = new Angle(360 / count).getAsRadian() * i;
+            const angle: number = (360 / count) * (180 / Math.PI) * i;
             const CX: number = this.GameObject.Transform.Position.X;
             const CY: number = this.GameObject.Transform.Position.Y;
             const X: number = CX + distance;
@@ -92,24 +100,6 @@ export class Shape extends Component {
     public update = (): void => {
         if (this._drawAction) {
             this._drawAction();
-            this._rotate();
-        }
-    }
-
-    private _rotate = (): void => {
-        //FIXME: Поломал вращение
-        if (this.GameObject.Layer && Math.round(this._Angle.getAsDegree()) !== Math.round(this.GameObject.Transform.Rotation.getAsDegree())) {
-            this._Angle = new Angle(this.GameObject.Transform.Rotation.getAsDegree());
-            this._Dots.forEach(dot => {
-                const CX: number = this.GameObject.Transform.Position.X;
-                const CY: number = this.GameObject.Transform.Position.Y;
-                const X: number = dot.X + CX;
-                const Y: number = dot.Y + CY;
-                const cos: number = Math.cos(this._Angle.getAsRadian());
-                const sin: number = Math.sin(this._Angle.getAsRadian());
-                dot.X = (cos * (X - CX)) + (sin * (Y - CY));
-                dot.Y = (cos * (Y - CY)) - (sin * (X - CX));
-            });
         }
     }
 }
