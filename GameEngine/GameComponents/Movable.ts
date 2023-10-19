@@ -25,21 +25,19 @@ export class Movable extends Component {
         this._onStart = action;
     }
 
-    public update = (): void => {
-        if (this.GameObject.compareTag('Player')) {
-            console.log(this.GameObject.Transform.Position, this.Target);
-        }
+    private _move = (): void => {
         if (this.Target !== undefined && this.Target.X !== this.GameObject.Transform.Position.X && this.Target.Y !== this.GameObject.Transform.Position.Y) {
+            this.Angle = Math.atan2(this.Target.Y - this.GameObject.Transform.Position.Y, this.Target.X - this.GameObject.Transform.Position.X);
+
             if (this._onStart && this._IsMoving === false) {
                 this._onStart(this.GameObject, this.Target, this.Angle);
             }
 
             this._IsMoving = true;
-            this.Angle = Math.atan2(this.Target.Y - this.GameObject.Transform.Position.Y, this.Target.X - this.GameObject.Transform.Position.X);
             const stepX: number = Math.cos(this.Angle) * this.Speed;
             const stepY: number = Math.sin(this.Angle) * this.Speed;
-            this.GameObject.Transform.Position.X += Math.floor(stepX);
-            this.GameObject.Transform.Position.Y += Math.floor(stepY);
+            this.GameObject.Transform.Position.X += stepX;
+            this.GameObject.Transform.Position.Y += stepY;
 
             if (Math.abs(this.GameObject.Transform.Position.X - this.Target.X) < stepX) {
                 this.GameObject.Transform.Position.X = this.Target.X;
@@ -57,5 +55,9 @@ export class Movable extends Component {
             this._IsMoving = false;
             this._onFinish(this.GameObject, this.Target, this.Angle);
         }
+    }
+
+    public update = (): void => {
+        this._move();
     }
 }

@@ -46,12 +46,5 @@ export class Image extends Component {
         if (this._drawAction) {
             this._drawAction();
         }
-        this._rotate();
-    }
-
-    private _rotate = (): void => {
-        if (this.GameObject.Layer) {
-            //FIXME: Добавить вращение картинки
-        }
     }
 }
