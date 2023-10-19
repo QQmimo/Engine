@@ -10,6 +10,7 @@ export class BaseObject {
 
     protected Tags: string[];
     private _Name: string;
+    private _onDestroy: () => void;
 
     public set Name(value: string) {
         if (BaseObject.find(value)) {
@@ -35,7 +36,13 @@ export class BaseObject {
 
     public destroy = (): void => {
         BaseObject.destroy(this.Name);
-        RecycleBin.destroy(this);
+        if (this._onDestroy) {
+            this._onDestroy();
+        }
+    }
+
+    protected onDestroy = (action: () => void): void => {
+        this._onDestroy = action;
     }
 
 
@@ -45,6 +52,10 @@ export class BaseObject {
         if (BaseObject.find(gameObject.Name)) {
             throw new Error(`ОШИБКА: ${this.name} с именем '${gameObject.Name}' уже существует.`);
         }
+        gameObject.onDestroy(() => {
+            this.BaseObjects = this.BaseObjects.filter(obj => obj.Name !== undefined);
+            console.log(this.BaseObjects);
+        });
         this.BaseObjects.push(gameObject);
     }
 
@@ -56,12 +67,16 @@ export class BaseObject {
         return this.BaseObjects.filter(gameObject => this.name === gameObject.constructor.name && gameObject.compareTag(tag));
     }
 
+    public static findAll(): BaseObject[] {
+        return this.BaseObjects.filter(gameObject => this.name === gameObject.constructor.name);
+    }
+
     public static destroy(name: string): void {
-        const index: number = this.BaseObjects.filter(obj => this.name === obj.constructor.name).map(gameObject => gameObject.Name).indexOf(name);
-        if (index !== -1) {
-            RecycleBin.destroy(this.BaseObjects[index]);
-            delete this.BaseObjects[index];
-            this.BaseObjects = this.BaseObjects.filter(obj => obj !== undefined);
-        }
+        RecycleBin.destroy(this.BaseObjects.find(obj => obj.Name === name));
+        this.clearGarbage();
+    }
+
+    public static clearGarbage = (): void => {
+        this.BaseObjects = this.BaseObjects.filter(obj => obj.Name !== undefined);
     }
 }

@@ -54,6 +54,7 @@ export class GameScreen extends BaseObject {
     }
 
     public update = (): void => {
+        this.clearGarbage();
         this.Layers.forEach(layer => {
             layer.Context.setTransform(1, 0, 0, 1, 0, 0);
             layer.Context.clearRect(0, 0, this.Canvas.width, this.Canvas.height);
@@ -61,6 +62,10 @@ export class GameScreen extends BaseObject {
             layer.Context.restore();
         });
 
+    }
+
+    public clearGarbage = (): void => {
+        this.Layers = this.Layers.filter(layer => layer.Name !== undefined);
     }
 
     public runLoop = (): void => {

@@ -51,6 +51,9 @@ export class GameObject extends BaseObject {
                     component[methodName].apply(this, ...args);
                 }
                 catch (error) {
+
+                    console.log(GameObject.findAll());
+
                     throw new Error(`ОШИБКА: Компонент '${component.constructor.name}' не смог запустить метод '${methodName}' со следующими аргументами: ${args.map(a => typeof a === 'number' ? a : `'${a}'`).join(', ')}.\n${error.message}`);
                 }
             });
@@ -59,9 +62,9 @@ export class GameObject extends BaseObject {
     public setLayer = (layer: GameLayer): void => {
         this.Layer = layer;
     }
-    
 
-    public static findAllWith<T extends Component>(component: { new(): T}): GameObject[] {
+
+    public static findAllWith<T extends Component>(component: { new(): T }): GameObject[] {
         return this.BaseObjects.filter(obj => obj instanceof GameObject && obj.getComponent(component) !== undefined) as GameObject[];
     }
 }

@@ -64,7 +64,7 @@ export class Shape extends Component {
     public drawByDotsCount = (count: number, distance: number): void => {
         const dots: Position[] = [];
         for (let i: number = 0; i < count; i++) {
-            const angle: number = (360 / count) * (180 / Math.PI) * i;
+            const angle: number = (360 / count) * (Math.PI / 180) * i; // FIXME: Нужен класс для конверти рования углов из радианы в градусы и обратно
             const CX: number = this.GameObject.Transform.Position.X;
             const CY: number = this.GameObject.Transform.Position.Y;
             const X: number = CX + distance;
@@ -85,6 +85,14 @@ export class Shape extends Component {
         this.StrokeWidth = width;
         this.StrokeColor = color;
         this.update();
+    }
+
+    public getStrokeWidth = (): number => {
+        return this.StrokeWidth;
+    }
+
+    public getStrokeColor = (): string => {
+        return this.StrokeColor;
     }
 
     public drawCircle = (radius: number): void => {
@@ -118,9 +126,17 @@ export class Shape extends Component {
         this.update();
     }
 
+    public getBackground = (): string => {
+        return this.BackgroundColor;
+    }
+
     public setOpacity = (opacity: number = 1): void => {
         this.Opacity = opacity;
         this.update();
+    }
+
+    public getOpacity = (): number => {
+        return this.Opacity;
     }
 
     public update = (): void => {

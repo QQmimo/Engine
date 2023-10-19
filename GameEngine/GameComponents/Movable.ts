@@ -1,9 +1,9 @@
 import { Component, GameObject, Position } from "../GameObject";
 
 export class Movable extends Component {
-    private _onMove: (gameObject: GameObject, target: Position, angle: number) => void;
-    private _onStart: (gameObject: GameObject, target: Position, angle: number) => void;
-    private _onFinish: (gameObject: GameObject, target: Position, angle: number) => void;
+    private _onMove: (component: Movable, gameObject: GameObject, target: Position) => void;
+    private _onStart: (component: Movable, gameObject: GameObject, target: Position) => void;
+    private _onFinish: (component: Movable, gameObject: GameObject) => void;
     private _IsMoving: boolean = false;
     protected Target: Position;
     public Speed: number = 1;
@@ -13,15 +13,15 @@ export class Movable extends Component {
         this.Target = target;
     }
 
-    public onMove = (action: (gameObject: GameObject, target: Position, angle: number) => void): void => {
+    public onMove = (action: (component: Movable, gameObject: GameObject, target: Position) => void): void => {
         this._onMove = action;
     }
 
-    public onFinish = (action: (gameObject: GameObject, target: Position, angle: number) => void): void => {
+    public onFinish = (action: (component: Movable, gameObject: GameObject) => void): void => {
         this._onFinish = action;
     }
 
-    public onStart = (action: (gameObject: GameObject, target: Position, angle: number) => void): void => {
+    public onStart = (action: (component: Movable, gameObject: GameObject, target: Position) => void): void => {
         this._onStart = action;
     }
 
@@ -30,7 +30,7 @@ export class Movable extends Component {
             this.Angle = Math.atan2(this.Target.Y - this.GameObject.Transform.Position.Y, this.Target.X - this.GameObject.Transform.Position.X);
 
             if (this._onStart && this._IsMoving === false) {
-                this._onStart(this.GameObject, this.Target, this.Angle);
+                this._onStart(this, this.GameObject, this.Target);
             }
 
             this._IsMoving = true;
@@ -47,13 +47,13 @@ export class Movable extends Component {
             }
 
             if (this._onMove) {
-                this._onMove(this.GameObject, this.Target, this.Angle);
+                this._onMove(this, this.GameObject, this.Target);
             }
         }
         else if (this.Target !== undefined && this._onFinish) {
             this.Target = undefined;
             this._IsMoving = false;
-            this._onFinish(this.GameObject, this.Target, this.Angle);
+            this._onFinish(this, this.GameObject);
         }
     }
 

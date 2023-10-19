@@ -28,9 +28,16 @@ export class GameLayer extends BaseObject {
         this.GameObjects.push(gameObject);
     }
 
+    public clearGarbage = (): void => {
+        this.GameObjects = this.GameObjects.filter(gameObject => gameObject.Name !== undefined);
+    }
+
     public update = (): void => {
+        this.clearGarbage();
         this.GameObjects.forEach(gameObject => {
-            gameObject.broadcastRun('update');
+            if (gameObject.broadcastRun) {
+                gameObject.broadcastRun('update');
+            }
         });
     }
 }

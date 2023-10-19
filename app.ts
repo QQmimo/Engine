@@ -1,31 +1,52 @@
-import { GameScreen, GameLayer, GameObject, Shape, Movable } from "./GameEngine";
+import { GameScreen, GameLayer, GameObject, Shape, Movable, Position } from "./GameEngine";
 import { Random } from "./Utilities";
 
 const screen: GameScreen = new GameScreen(document.body);
 const world: GameLayer = screen.addLayer('world');
 
-for (let i: number = 0; i < 500; i++) {
-    const cube: GameObject = new GameObject(`cube_${i}`, Shape, Movable);
-    cube.Transform.Position = { X: Random.Integer(innerWidth), Y: Random.Integer(innerHeight) };
+for (let i: number = 0; i < 5; i++) {
+    const triangle: GameObject = new GameObject(`cube_${i}`, Shape, Movable);
+    triangle.Transform.Position = { X: Random.Integer(innerWidth), Y: Random.Integer(innerHeight) };
 
     const size: number = Random.Integer(10, 25);
 
-    const shape: Shape = cube.getComponent(Shape);
+    const shape: Shape = triangle.getComponent(Shape);
     shape.setBackground(Random.Color());
-    shape.drawByDots({ X: size, Y: 0 }, { X: -size, Y: size }, { X: -size, Y: -size });
+    shape.drawByDotsCount(5, 25);
 
-    const movable: Movable = cube.getComponent(Movable);
+    const movable: Movable = triangle.getComponent(Movable);
     movable.Speed = Random.Integer(2, 10);
-    movable.onStart((gameObject, target) => {
+    movable.onStart((component, gameObject, target) => {
         gameObject.Transform.Rotation.rotateByPoint(target);
+        const dot: GameObject = new GameObject(`dot_${gameObject.Name}`, Shape);
+        dot.addTags('point', gameObject.Name);
+        dot.Transform.Position = target;
+
+        const shapeDot: Shape = dot.getComponent(Shape);
+        shapeDot.drawCircle(2);
+        shapeDot.setBackground(gameObject.getComponent(Shape).getBackground());
+        shapeDot.setStroke(1);
+        world.addObject(dot);
     });
-    movable.onFinish((gameObject) => {
-        gameObject.getComponent(Movable).Speed = Random.Integer(2, 10);
-        gameObject.getComponent(Movable).moveTo({ X: Random.Integer(innerWidth), Y: Random.Integer(innerHeight) });
+    movable.onFinish((component, gameObject) => {
+        GameObject.findByTag('point').find(obj => obj.compareTag(gameObject.Name))?.destroy();
+        gameObject.getComponent(Shape).drawByDotsCount(Random.Integer(3, 10), 25);
+        component.Speed = Random.Integer(2, 10);
+        component.moveTo({ X: Random.Integer(innerWidth), Y: Random.Integer(innerHeight) });
+    });
+    movable.onMove((component, gameObject, target) => {
+        world.Context.beginPath();
+        world.Context.globalAlpha = 0.35;
+        world.Context.moveTo(gameObject.Transform.Position.X, gameObject.Transform.Position.Y);
+        world.Context.lineTo(target.X, target.Y);
+        world.Context.strokeStyle = gameObject.getComponent(Shape).getBackground();
+        world.Context.lineWidth = 1;
+        world.Context.setLineDash([5, 3]);
+        world.Context.stroke();
+        world.Context.closePath();
     });
     movable.moveTo({ X: Random.Integer(innerWidth), Y: Random.Integer(innerHeight) });
-
-    world.addObject(cube);
+    world.addObject(triangle);
 }
 
 screen.runLoop();
