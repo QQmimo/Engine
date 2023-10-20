@@ -4,8 +4,8 @@ import { GameLayer } from "../GameLayer";
 export class GameScreen extends BaseObject {
     constructor(target: HTMLElement, width?: number, height?: number) {
         super('GameScreen');
-        this.Layers = [];
         this.Canvas = document.createElement('canvas');
+        this.Context = this.Canvas.getContext('2d');
         if (width === undefined || height === undefined || width === null || height === null) {
             this._resizeCanvas();
             window.addEventListener("resize", (e) => {
@@ -19,9 +19,12 @@ export class GameScreen extends BaseObject {
         target.appendChild(this.Canvas);
     }
 
-    public Canvas: HTMLCanvasElement;
-    protected Layers: GameLayer[];
-
+    protected Loop: number;
+    protected get Childs(): GameLayer[] {
+        return super.Childs as GameLayer[];
+    }
+    public readonly Canvas: HTMLCanvasElement;
+    public readonly Context: CanvasRenderingContext2D;
 
     private _resizeCanvas = (): void => {
         this.Canvas.width = innerWidth;
@@ -30,46 +33,28 @@ export class GameScreen extends BaseObject {
     }
 
     public addLayer = (name: string): GameLayer => {
-        const layer: GameLayer = new GameLayer(name, this);
-        layer.Order = this.Layers.length;
-        this.Layers.push(layer);
-        return layer;
-    }
-
-    public sortLayers = (): void => {
-        this.Layers = this.Layers.sort((a, b) => {
-            if (a.Order > b.Order) {
-                return -1;
-            }
-            else if (a.Order < b.Order) {
-                return 1;
-            }
-            return 0;
-        });
-        this.update();
+        return new GameLayer(name, this);
     }
 
     public removeLayer = (name: string): void => {
-        this.Layers.find(layer => layer.Name === name)?.destroy();
+        GameLayer.find(name)?.destroy();
     }
 
     public update = (): void => {
-        this.clearGarbage();
-        this.Layers.forEach(layer => {
-            layer.Context.setTransform(1, 0, 0, 1, 0, 0);
-            layer.Context.clearRect(0, 0, this.Canvas.width, this.Canvas.height);
+        this.Context.clearRect(0, 0, this.Canvas.width, this.Canvas.height);
+        this.Childs.forEach(layer => {
+            this.Context.setTransform(1, 0, 0, 1, 0, 0);
             layer.update();
-            layer.Context.restore();
+            this.Context.restore();
         });
-
-    }
-
-    public clearGarbage = (): void => {
-        this.Layers = this.Layers.filter(layer => layer.Name !== undefined);
     }
 
     public runLoop = (): void => {
         this.update();
         requestAnimationFrame(this.runLoop);
+    }
+
+    public stopLoop = (): void => {
+        cancelAnimationFrame(this.Loop);
     }
 }

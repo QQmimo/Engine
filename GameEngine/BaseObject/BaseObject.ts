@@ -1,5 +1,4 @@
 import { RecycleBin } from "../../Utilities";
-import { Component, GameObject } from "../GameObject";
 
 export class BaseObject {
     constructor(name: string) {
@@ -8,10 +7,18 @@ export class BaseObject {
         BaseObject.add(this);
     }
 
+    protected Parent: BaseObject;
+    protected get Childs(): BaseObject[] {
+        return Array.from(BaseObject.BaseObjects, ([key, value]) => value).filter(obj => obj.Parent === this);
+    }
     protected Tags: string[];
     private _Name: string;
     private _onDestroy: () => void;
 
+
+    protected onDestroy = (action: () => void): void => {
+        this._onDestroy = action;
+    }
     public set Name(value: string) {
         if (BaseObject.find(value)) {
             throw new Error(`ОШИБКА: ${this.constructor.name} с именем '${value}' уже существует.`);
@@ -41,42 +48,30 @@ export class BaseObject {
         }
     }
 
-    protected onDestroy = (action: () => void): void => {
-        this._onDestroy = action;
-    }
 
 
-    protected static BaseObjects: BaseObject[] = [];
+    protected static BaseObjects: Map<string, BaseObject> = new Map();
 
     protected static add(gameObject: BaseObject): void {
         if (BaseObject.find(gameObject.Name)) {
             throw new Error(`ОШИБКА: ${this.name} с именем '${gameObject.Name}' уже существует.`);
         }
-        gameObject.onDestroy(() => {
-            this.BaseObjects = this.BaseObjects.filter(obj => obj.Name !== undefined);
-            console.log(this.BaseObjects);
-        });
-        this.BaseObjects.push(gameObject);
+        this.BaseObjects.set(gameObject.Name, gameObject);
     }
 
     public static find(name: string): BaseObject | undefined {
-        return this.BaseObjects.find(obj => obj.Name === name);
+        return this.BaseObjects.get(name);
     }
 
     public static findByTag(tag: string): BaseObject[] {
-        return this.BaseObjects.filter(gameObject => this.name === gameObject.constructor.name && gameObject.compareTag(tag));
+        return Array.from(this.BaseObjects, ([key, value]) => value).filter(gameObject => this.name === gameObject.constructor.name && gameObject.compareTag(tag));
     }
 
     public static findAll(): BaseObject[] {
-        return this.BaseObjects.filter(gameObject => this.name === gameObject.constructor.name);
+        return Array.from(this.BaseObjects, ([key, value]) => value).filter(gameObject => this.name === gameObject.constructor.name);
     }
 
     public static destroy(name: string): void {
-        RecycleBin.destroy(this.BaseObjects.find(obj => obj.Name === name));
-        this.clearGarbage();
-    }
-
-    public static clearGarbage = (): void => {
-        this.BaseObjects = this.BaseObjects.filter(obj => obj.Name !== undefined);
+        this.BaseObjects.delete(name);
     }
 }

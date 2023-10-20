@@ -5,6 +5,7 @@ export class Shape extends Component {
     private _Dots: Position[] = [];
     protected StrokeWidth: number;
     protected StrokeColor: string;
+    protected StrokeDashTemplate: number[];
     protected BackgroundColor: string;
     protected Opacity: number = 1;
 
@@ -46,6 +47,7 @@ export class Shape extends Component {
                     }
                 });
                 if (this.StrokeColor) {
+                    this.GameObject.Layer.Context.setLineDash(this.StrokeDashTemplate || []);
                     this.GameObject.Layer.Context.strokeStyle = this.StrokeColor;
                     this.GameObject.Layer.Context.lineWidth = this.StrokeWidth;
                     this.GameObject.Layer.Context.stroke();
@@ -62,9 +64,10 @@ export class Shape extends Component {
     }
 
     public drawByDotsCount = (count: number, distance: number): void => {
-        const dots: Position[] = [];
+        this._Dots = [];
         for (let i: number = 0; i < count; i++) {
-            const angle: number = (360 / count) * (Math.PI / 180) * i; // FIXME: Нужен класс для конверти рования углов из радианы в градусы и обратно
+            // FIXME: Нужен класс для конвертирования углов из радианы в градусы и обратно
+            const angle: number = (360 / count) * (Math.PI / 180) * i;
             const CX: number = this.GameObject.Transform.Position.X;
             const CY: number = this.GameObject.Transform.Position.Y;
             const X: number = CX + distance;
@@ -72,19 +75,22 @@ export class Shape extends Component {
             const cos: number = Math.cos(angle);
             const sin: number = Math.sin(angle);
 
-            dots.push({
+            this._Dots.push({
                 X: (cos * (X - CX)) + (sin * (Y - CY)),
                 Y: (cos * (Y - CY)) - (sin * (X - CX))
             });
         }
 
-        this.drawByDots(...dots);
+        this.drawByDots(...this._Dots);
     }
 
     public setStroke = (width: number, color: string = 'black'): void => {
         this.StrokeWidth = width;
         this.StrokeColor = color;
-        this.update();
+    }
+
+    public setStrokeDash = (template: number[]): void => {
+        this.StrokeDashTemplate = template;
     }
 
     public getStrokeWidth = (): number => {
@@ -106,6 +112,7 @@ export class Shape extends Component {
                 this.GameObject.Layer.Context.arc(centerX, centerY, radius, this.GameObject.Transform.Rotation.RadianAngle, 2 * Math.PI);
 
                 if (this.StrokeColor) {
+                    this.GameObject.Layer.Context.setLineDash(this.StrokeDashTemplate || []);
                     this.GameObject.Layer.Context.strokeStyle = this.StrokeColor;
                     this.GameObject.Layer.Context.lineWidth = this.StrokeWidth;
                     this.GameObject.Layer.Context.stroke();
@@ -123,7 +130,6 @@ export class Shape extends Component {
 
     public setBackground = (color: string): void => {
         this.BackgroundColor = color;
-        this.update();
     }
 
     public getBackground = (): string => {
@@ -140,7 +146,7 @@ export class Shape extends Component {
     }
 
     public update = (): void => {
-        if (this._drawAction) {
+        if (typeof this._drawAction !== 'undefined') {
             this._drawAction();
         }
     }

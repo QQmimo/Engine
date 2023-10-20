@@ -5,42 +5,40 @@ import { Component, Transform } from "./Properties";
 export class GameObject extends BaseObject {
     constructor(name: string, ...components: typeof Component[]) {
         super(name);
-        this.Components = [];
+        this.Components = new Map();
         this.Tags = [];
         this.IsHidden = false;
-        this.Transform = new Transform(this);
+        this.Transform = new Transform();
         components.forEach(component => {
             this.addComponent(component);
         });
     }
 
+    protected Components: Map<string, Component>;
     public IsHidden: boolean;
     public Transform: Transform;
     public Layer: GameLayer;
-    protected Components: Component[];
 
-    public addComponent = <T extends Component>(type: { new(gameObject: GameObject): T }): T => {
+    protected addComponent = <T extends Component>(type: { new(gameObject: GameObject): T }): T => {
         const component: T = new type(this);
-        this.Components.push(component);
+        this.Components.set(type.name, component);
         return component;
     }
 
     public getComponent = <T extends Component>(type: { new(gameObject: GameObject): T }): T => {
-        const target: T = new type(undefined);
-        const found: T = this.Components.find(component => component.constructor.name === target.constructor.name) as T;
-        if (!found) {
-            throw new Error(`ОШИБКА: Компонент '${target.constructor.name}' не найден.`);
+        const found: T = this.Components.get(type.name) as T;
+        if (found === undefined) {
+            throw new Error(`ОШИБКА: Компонент '${type.name}' не найден.`);
         }
         return found;
     }
 
     public detachComponent = <T extends Component>(type: { new(gameObject: GameObject): T }): void => {
-        const target: T = new type(undefined);
-        this.Components = this.Components.filter(component => component.constructor.name !== target.constructor.name);
+        this.Components.delete(type.name);
     }
 
     public broadcastRun = (methodName: string, ...args: unknown[]): void => {
-        this.Components
+        Array.from(this.Components, ([key, value]) => value)
             .filter(component => component[methodName] && typeof component[methodName] === 'function')
             .forEach(component => {
                 if (component[methodName].length !== args.length) {
@@ -51,9 +49,6 @@ export class GameObject extends BaseObject {
                     component[methodName].apply(this, ...args);
                 }
                 catch (error) {
-
-                    console.log(GameObject.findAll());
-
                     throw new Error(`ОШИБКА: Компонент '${component.constructor.name}' не смог запустить метод '${methodName}' со следующими аргументами: ${args.map(a => typeof a === 'number' ? a : `'${a}'`).join(', ')}.\n${error.message}`);
                 }
             });
@@ -61,10 +56,6 @@ export class GameObject extends BaseObject {
 
     public setLayer = (layer: GameLayer): void => {
         this.Layer = layer;
-    }
-
-
-    public static findAllWith<T extends Component>(component: { new(): T }): GameObject[] {
-        return this.BaseObjects.filter(obj => obj instanceof GameObject && obj.getComponent(component) !== undefined) as GameObject[];
+        this.Parent = layer;
     }
 }

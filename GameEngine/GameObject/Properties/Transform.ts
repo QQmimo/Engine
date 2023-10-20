@@ -1,17 +1,22 @@
-import { GameObject } from "../GameObject";
 import { Position } from "./Position";
 import { Rotation } from "./Rotation";
 
 export class Transform {
-    constructor(gameObject: GameObject) {
-        this.GameObject = gameObject;
-        this.Rotation = new Rotation(gameObject);
+    constructor() {
         this.Position = { X: 0, Y: 0 };
+        this.Rotation = new Rotation(this.Position);
         this.Scale = 1;
     }
 
-    protected GameObject: GameObject;
-    public Position: Position;
+    private _Position: Position;
+
+    public get Position(): Position {
+        return this._Position
+    }
+    public set Position(value: Position) {
+        this._Position = value;
+        this.Rotation = new Rotation(this._Position);
+    }
     public Rotation: Rotation;
     public Scale: number;
 }
