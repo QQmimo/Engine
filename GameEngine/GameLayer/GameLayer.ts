@@ -7,12 +7,19 @@ export class GameLayer extends BaseObject {
         super(name);
         this.Parent = screen;
         this.Context = screen.Context;
-        //FIXME: Нужно сделать очередь отрисовки на основе слоя
     }
 
+    private _Order: number;
     protected Parent: GameScreen;
     protected get Childs(): GameObject[] {
         return super.Childs as GameObject[];
+    }
+    public get Order(): number {
+        return this._Order;
+    }
+    public set Order(value: number) {
+        this._Order = value;
+        this.Parent.sortLayers();
     }
 
     public readonly Context: CanvasRenderingContext2D;
@@ -23,8 +30,8 @@ export class GameLayer extends BaseObject {
 
     public update = (): void => {
         this.Childs.forEach(gameObject => {
-            if (gameObject.broadcastRun) {
-                gameObject.broadcastRun('update');
+            if (gameObject.broadcast) {
+                gameObject.broadcast('update');
             }
         });
     }

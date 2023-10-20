@@ -37,7 +37,7 @@ export class GameObject extends BaseObject {
         this.Components.delete(type.name);
     }
 
-    public broadcastRun = (methodName: string, ...args: unknown[]): void => {
+    public broadcast = (methodName: string, ...args: unknown[]): void => {
         Array.from(this.Components, ([key, value]) => value)
             .filter(component => component[methodName] && typeof component[methodName] === 'function')
             .forEach(component => {
@@ -57,5 +57,18 @@ export class GameObject extends BaseObject {
     public setLayer = (layer: GameLayer): void => {
         this.Layer = layer;
         this.Parent = layer;
+    }
+
+
+    public static find(name: string): GameObject | undefined {
+        return super.find(name) as GameObject;
+    }
+
+    public static findAll(): GameObject[] {
+        return super.findAll() as GameObject[];
+    }
+
+    public static findByTag(tag: string): GameObject[] {
+        return super.findByTag(tag) as GameObject[];
     }
 }

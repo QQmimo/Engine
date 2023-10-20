@@ -59,8 +59,6 @@ export class Shape extends Component {
                 this.GameObject.Layer.Context.closePath();
             }
         }
-
-        this.update();
     }
 
     public drawByDotsCount = (count: number, distance: number): void => {
@@ -124,8 +122,25 @@ export class Shape extends Component {
                 this.GameObject.Layer.Context.closePath();
             }
         }
+    }
 
-        this.update();
+    public drawLineTo = (point: Position): void => {
+        this._drawAction = (): void => {
+            if (this.GameObject.Layer && !this.GameObject.IsHidden) {
+                this.GameObject.Layer.Context.beginPath();
+                this.GameObject.Layer.Context.globalAlpha = this.Opacity;
+
+                this.GameObject.Layer.Context.moveTo(this.GameObject.Transform.Position.X, this.GameObject.Transform.Position.Y);
+                this.GameObject.Layer.Context.lineTo(point.X, point.Y);
+
+                if (this.StrokeColor) {
+                    this.GameObject.Layer.Context.setLineDash(this.StrokeDashTemplate || []);
+                    this.GameObject.Layer.Context.strokeStyle = this.StrokeColor;
+                    this.GameObject.Layer.Context.lineWidth = this.StrokeWidth;
+                    this.GameObject.Layer.Context.stroke();
+                }
+            }
+        }
     }
 
     public setBackground = (color: string): void => {
@@ -138,7 +153,6 @@ export class Shape extends Component {
 
     public setOpacity = (opacity: number = 1): void => {
         this.Opacity = opacity;
-        this.update();
     }
 
     public getOpacity = (): number => {

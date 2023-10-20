@@ -1,5 +1,6 @@
 import { BaseObject } from "../BaseObject";
 import { GameLayer } from "../GameLayer";
+import { GameObject } from "../GameObject";
 
 export class GameScreen extends BaseObject {
     constructor(target: HTMLElement, width?: number, height?: number) {
@@ -33,7 +34,9 @@ export class GameScreen extends BaseObject {
     }
 
     public addLayer = (name: string): GameLayer => {
-        return new GameLayer(name, this);
+        const layer: GameLayer = new GameLayer(name, this);
+        layer.Order = this.Childs.length;
+        return layer;
     }
 
     public removeLayer = (name: string): void => {
@@ -47,6 +50,23 @@ export class GameScreen extends BaseObject {
             layer.update();
             this.Context.restore();
         });
+    }
+
+    public sortLayers = (): void => {
+        BaseObject.BaseObjects = new Map(Array.from(BaseObject.BaseObjects, ([key, value]) => value)
+            .sort((a, b) => {
+                if (!(a instanceof GameLayer) || !(b instanceof GameLayer)) {
+                    return 0;
+                }
+                else if (a.Order > b.Order) {
+                    return 1;
+                }
+                else if (a.Order < b.Order) {
+                    return -1;
+                }
+                return 0;
+            })
+            .map(obj => [obj.Name, obj]));
     }
 
     public runLoop = (): void => {
