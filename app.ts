@@ -5,7 +5,7 @@ const screen: GameScreen = new GameScreen(document.body);
 const hud: GameLayer = screen.addLayer('hud');
 const world: GameLayer = screen.addLayer('world');
 
-for (let i: number = 0; i < 10; i++) {
+for (let i: number = 0; i < 500; i++) {
     const obj: GameObject = new GameObject(`cube_${i}`, Shape, Movable, Dictionary);
     obj.Transform.Position = { X: Random.Integer(innerWidth), Y: Random.Integer(innerHeight) };
 
@@ -72,4 +72,17 @@ screen.Canvas.addEventListener('click', () => {
         hud.Order = 2;
         world.Order = 1;
     }
+});
+
+let pause: boolean = false;
+screen.Canvas.addEventListener('contextmenu', (e) => {
+    if (pause) {
+        pause = false
+        screen.runLoop();
+    }
+    else {
+        pause = true;
+        screen.stopLoop();
+    }
+    e.preventDefault();
 });

@@ -71,7 +71,7 @@ export class GameScreen extends BaseObject {
 
     public runLoop = (): void => {
         this.update();
-        requestAnimationFrame(this.runLoop);
+        this.Loop = requestAnimationFrame(this.runLoop);
     }
 
     public stopLoop = (): void => {
