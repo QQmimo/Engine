@@ -76,7 +76,6 @@ for (let i: number = 0; i < 10; i++) {
 
 screen.play();
 
-
 screen.Canvas.addEventListener('click', () => {
     if (hud.Order > world.Order) {
         hud.Order = 1;

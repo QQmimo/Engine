@@ -1,6 +1,4 @@
 import { BaseObject } from "../BaseObject";
-import { GameLayer } from "../GameLayer";
-import { GameObject } from "../GameObject";
 import { GameScene } from "../GameScene";
 
 export class GameScreen extends BaseObject {
@@ -71,6 +69,7 @@ export class GameScreen extends BaseObject {
     }
 
     public play = (): void => {
+        //FIXME: Нужно подумать как переделать play/pause чтобы оно относилось только к активной scene
         this.update();
         this.Loop = requestAnimationFrame(this.play);
     }
