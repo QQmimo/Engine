@@ -1,9 +1,13 @@
-import { GameScreen, GameLayer, GameObject, Shape, Movable, Dictionary } from "./GameEngine";
+import { GameScreen, GameLayer, GameObject, Shape, Movable, Dictionary, GameScene } from "./GameEngine";
 import { Distance, Random } from "./Utilities";
 
 const screen: GameScreen = new GameScreen(document.body);
-const hud: GameLayer = screen.addLayer('hud');
-const world: GameLayer = screen.addLayer('world');
+const gameScene: GameScene = screen.addScene('game');
+gameScene.IsActive = true;
+const hud: GameLayer = gameScene.addLayer('hud');
+const world: GameLayer = gameScene.addLayer('world');
+const gameMenu: GameScene = screen.addScene('menu');
+const layerMenu: GameLayer = gameMenu.addLayer('manu-layer');
 
 for (let i: number = 0; i < 500; i++) {
     const obj: GameObject = new GameObject(`cube_${i}`, Shape, Movable, Dictionary);
@@ -60,7 +64,17 @@ for (let i: number = 0; i < 500; i++) {
     world.addObject(obj);
 }
 
-screen.runLoop();
+for (let i: number = 0; i < 10; i++) {
+    const obj: GameObject = new GameObject(`Qube_${i}`, Shape);
+    obj.Transform.Position = { X: Random.Integer(innerWidth), Y: Random.Integer(innerHeight) };
+
+    const shape: Shape = obj.getComponent(Shape);
+    shape.drawCircle(Random.Integer(10, 30));
+    shape.setBackground(Random.Color());
+    layerMenu.addObject(obj);
+}
+
+screen.play();
 
 
 screen.Canvas.addEventListener('click', () => {
@@ -78,11 +92,22 @@ let pause: boolean = false;
 screen.Canvas.addEventListener('contextmenu', (e) => {
     if (pause) {
         pause = false
-        screen.runLoop();
+        screen.play();
     }
     else {
         pause = true;
-        screen.stopLoop();
+        screen.pause();
     }
     e.preventDefault();
 });
+
+document.addEventListener('keypress', (e) => {
+    if ((e.key === 'Spacebar' || e.key === ' ') && gameScene.IsActive) {
+        gameScene.IsActive = false;
+        gameMenu.IsActive = true;
+    }
+    else {
+        gameScene.IsActive = true;
+        gameMenu.IsActive = false;
+    }
+})

@@ -1,6 +1,7 @@
 import { BaseObject } from "../BaseObject";
 import { GameLayer } from "../GameLayer";
 import { GameObject } from "../GameObject";
+import { GameScene } from "../GameScene";
 
 export class GameScreen extends BaseObject {
     constructor(target: HTMLElement, width?: number, height?: number) {
@@ -21,8 +22,8 @@ export class GameScreen extends BaseObject {
     }
 
     protected Loop: number;
-    protected get Childs(): GameLayer[] {
-        return super.Childs as GameLayer[];
+    protected get Childs(): GameScene[] {
+        return super.Childs as GameScene[];
     }
     public readonly Canvas: HTMLCanvasElement;
     public readonly Context: CanvasRenderingContext2D;
@@ -33,29 +34,29 @@ export class GameScreen extends BaseObject {
         this.Canvas.style.cssText = 'position: absolute; top: 0; left: 0;';
     }
 
-    public addLayer = (name: string): GameLayer => {
-        const layer: GameLayer = new GameLayer(name, this);
-        layer.Order = this.Childs.length;
-        return layer;
+    public addScene = (name: string): GameScene => {
+        const scene: GameScene = new GameScene(name, this);
+        scene.Order = this.Childs.length;
+        return scene;
     }
 
-    public removeLayer = (name: string): void => {
-        GameLayer.find(name)?.destroy();
+    public removeScene = (name: string): void => {
+        GameScene.find(name)?.destroy();
     }
 
     public update = (): void => {
         this.Context.clearRect(0, 0, this.Canvas.width, this.Canvas.height);
-        this.Childs.forEach(layer => {
+        this.Childs.filter(scene => scene.IsActive).forEach(scene => {
             this.Context.setTransform(1, 0, 0, 1, 0, 0);
-            layer.update();
+            scene.update();
             this.Context.restore();
         });
     }
 
-    public sortLayers = (): void => {
+    public sortScenes = (): void => {
         BaseObject.BaseObjects = new Map(Array.from(BaseObject.BaseObjects, ([key, value]) => value)
             .sort((a, b) => {
-                if (!(a instanceof GameLayer) || !(b instanceof GameLayer)) {
+                if (!(a instanceof GameScene) || !(b instanceof GameScene)) {
                     return 0;
                 }
                 else if (a.Order > b.Order) {
@@ -69,12 +70,12 @@ export class GameScreen extends BaseObject {
             .map(obj => [obj.Name, obj]));
     }
 
-    public runLoop = (): void => {
+    public play = (): void => {
         this.update();
-        this.Loop = requestAnimationFrame(this.runLoop);
+        this.Loop = requestAnimationFrame(this.play);
     }
 
-    public stopLoop = (): void => {
+    public pause = (): void => {
         cancelAnimationFrame(this.Loop);
     }
 }

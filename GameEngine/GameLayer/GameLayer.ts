@@ -1,16 +1,17 @@
 import { BaseObject } from "../BaseObject";
 import { GameObject } from "../GameObject";
+import { GameScene } from "../GameScene";
 import { GameScreen } from "../GameScreen";
 
 export class GameLayer extends BaseObject {
-    constructor(name: string, screen: GameScreen) {
+    constructor(name: string, scene: GameScene) {
         super(name);
-        this.Parent = screen;
-        this.Context = screen.Context;
+        this.Parent = scene;
+        this.Context = scene.Context;
     }
 
     private _Order: number;
-    protected Parent: GameScreen;
+    protected Parent: GameScene;
     protected get Childs(): GameObject[] {
         return super.Childs as GameObject[];
     }
