@@ -71,4 +71,8 @@ export class GameObject extends BaseObject {
     public static findByTag(tag: string): GameObject[] {
         return super.findByTag(tag) as GameObject[];
     }
+
+    public static findByComponent(component: typeof Component): GameObject[] {
+        return Array.from(super.BaseObjects, ([key, value]) => value).filter(obj => obj instanceof GameObject && obj.getComponent(component)) as GameObject[];
+    }
 }

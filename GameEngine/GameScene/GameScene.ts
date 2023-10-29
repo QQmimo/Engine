@@ -7,22 +7,25 @@ export class GameScene extends BaseObject {
         super(name);
         this.Parent = screen;
         this.Context = screen.Context;
-        this._IsActive = false;
+        this._IsActive = true;
     }
 
     private _IsActive: boolean;
     private _Order: number;
     protected Loop: number;
     protected Parent: GameScreen;
+    protected get Childs(): GameLayer[] {
+        return super.Childs as GameLayer[];
+    }
     public readonly Context: CanvasRenderingContext2D;
+    public get Screen(): GameScreen {
+        return this.Parent;
+    }
     public get IsActive(): boolean {
         return this._IsActive;
     }
     public set IsActive(value: boolean) {
         this._IsActive = value;
-    }
-    protected get Childs(): GameLayer[] {
-        return super.Childs as GameLayer[];
     }
     public get Order(): number {
         return this._Order;

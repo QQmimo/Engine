@@ -3,6 +3,7 @@ import { Component, Position } from "../GameObject";
 export class Shape extends Component {
     private _drawAction: Function;
     private _Dots: Position[] = [];
+    private _Radius: number;
     protected StrokeWidth: number;
     protected StrokeColor: string;
     protected StrokeDashTemplate: number[];
@@ -10,6 +11,7 @@ export class Shape extends Component {
     protected Opacity: number = 1;
 
     public drawByDots = (...dots: Position[]): void => {
+        this._Radius = undefined;
         this._Dots = dots;
         this._drawAction = (): void => {
             if (this.GameObject.Layer && !this.GameObject.IsHidden) {
@@ -17,12 +19,12 @@ export class Shape extends Component {
                 this.GameObject.Layer.Context.globalAlpha = this.Opacity;
                 const centerX: number = this.GameObject.Transform.Position.X;
                 const centerY: number = this.GameObject.Transform.Position.Y;
-                const andle: number = this.GameObject.Transform.Rotation.RadianAngle;
+                const angle: number = this.GameObject.Transform.Rotation.RadianAngle;
                 this._Dots.forEach((dot, index, self) => {
                     const dotX: number = dot.X + centerX;
                     const dotY: number = dot.Y + centerY;
-                    const cos: number = Math.cos(andle);
-                    const sin: number = Math.sin(andle);
+                    const cos: number = Math.cos(angle);
+                    const sin: number = Math.sin(angle);
 
                     if (index === 0) {
                         this.GameObject.Layer.Context.moveTo(
@@ -62,7 +64,7 @@ export class Shape extends Component {
     }
 
     public drawByDotsCount = (count: number, distance: number): void => {
-        this._Dots = [];
+        const dots: Position[] = [];
         for (let i: number = 0; i < count; i++) {
             // FIXME: Нужен класс для конвертирования углов из радианы в градусы и обратно
             const angle: number = (360 / count) * (Math.PI / 180) * i;
@@ -73,13 +75,13 @@ export class Shape extends Component {
             const cos: number = Math.cos(angle);
             const sin: number = Math.sin(angle);
 
-            this._Dots.push({
+            dots.push({
                 X: (cos * (X - CX)) + (sin * (Y - CY)),
                 Y: (cos * (Y - CY)) - (sin * (X - CX))
             });
         }
 
-        this.drawByDots(...this._Dots);
+        this.drawByDots(...dots);
     }
 
     public setStroke = (width: number, color: string = 'black'): void => {
@@ -100,6 +102,7 @@ export class Shape extends Component {
     }
 
     public drawCircle = (radius: number): void => {
+        this._Radius = radius;
         this._drawAction = (): void => {
             if (this.GameObject.Layer && !this.GameObject.IsHidden) {
                 this.GameObject.Layer.Context.beginPath();
@@ -107,7 +110,7 @@ export class Shape extends Component {
                 const centerX: number = this.GameObject.Transform.Position.X;
                 const centerY: number = this.GameObject.Transform.Position.Y;
 
-                this.GameObject.Layer.Context.arc(centerX, centerY, radius, this.GameObject.Transform.Rotation.RadianAngle, 2 * Math.PI);
+                this.GameObject.Layer.Context.arc(centerX, centerY, radius, this.GameObject.Transform.Rotation.RadianAngle, 2 * Math.PI + this.GameObject.Transform.Rotation.RadianAngle);
 
                 if (this.StrokeColor) {
                     this.GameObject.Layer.Context.setLineDash(this.StrokeDashTemplate || []);
@@ -125,6 +128,8 @@ export class Shape extends Component {
     }
 
     public drawLineTo = (point: Position): void => {
+        this._Radius = undefined;
+        this._Dots = [this.GameObject.Transform.Position, point];
         this._drawAction = (): void => {
             if (this.GameObject.Layer && !this.GameObject.IsHidden) {
                 this.GameObject.Layer.Context.beginPath();
@@ -157,6 +162,19 @@ export class Shape extends Component {
 
     public getOpacity = (): number => {
         return this.Opacity;
+    }
+
+    public getDots = (): Position[] => {
+        return this._Dots.map(dot => {
+            return {
+                X: dot.X + this.GameObject.Transform.Position.X,
+                Y: dot.Y + this.GameObject.Transform.Position.Y
+            };
+        });
+    }
+
+    public getRadius = (): number => {
+        return this._Radius;
     }
 
     public update = (): void => {

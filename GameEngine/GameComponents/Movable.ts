@@ -5,25 +5,9 @@ export class Movable extends Component {
     private _onStart: (component: Movable, gameObject: GameObject, target: Position) => void;
     private _onFinish: (component: Movable, gameObject: GameObject) => void;
     private _IsMoving: boolean = false;
-    protected Target: Position;
+    public Target: Position;
     public Speed: number = 1;
     public Angle: number = 0;
-
-    public moveTo = (target: Position): void => {
-        this.Target = target;
-    }
-
-    public onMove = (action: (component: Movable, gameObject: GameObject, target: Position) => void): void => {
-        this._onMove = action;
-    }
-
-    public onFinish = (action: (component: Movable, gameObject: GameObject) => void): void => {
-        this._onFinish = action;
-    }
-
-    public onStart = (action: (component: Movable, gameObject: GameObject, target: Position) => void): void => {
-        this._onStart = action;
-    }
 
     private _move = (): void => {
         if (this.Target !== undefined && this.Target.X !== this.GameObject.Transform.Position.X && this.Target.Y !== this.GameObject.Transform.Position.Y) {
@@ -53,6 +37,30 @@ export class Movable extends Component {
         else if (this.Target !== undefined && this._onFinish) {
             this.Target = undefined;
             this._IsMoving = false;
+            this._onFinish(this, this.GameObject);
+        }
+    }
+
+    public moveTo = (target: Position): void => {
+        this.Target = target;
+    }
+
+    public onMove = (action: (component: Movable, gameObject: GameObject, target: Position) => void): void => {
+        this._onMove = action;
+    }
+
+    public onFinish = (action: (component: Movable, gameObject: GameObject) => void): void => {
+        this._onFinish = action;
+    }
+
+    public onStart = (action: (component: Movable, gameObject: GameObject, target: Position) => void): void => {
+        this._onStart = action;
+    }
+
+    public stop = (isWithcallBack: boolean = true): void => {
+        this.Target = undefined;
+        this._IsMoving = false;
+        if (this._onFinish && isWithcallBack) {
             this._onFinish(this, this.GameObject);
         }
     }

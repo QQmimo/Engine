@@ -26,4 +26,8 @@ export class Rotation {
         this.RadianAngle = radian;
         return this.RadianAngle;
     }
+
+    public setCenter = (center: Position): void => {
+        this.Center = center;
+    }
 }

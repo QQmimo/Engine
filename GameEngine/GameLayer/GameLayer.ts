@@ -15,6 +15,9 @@ export class GameLayer extends BaseObject {
     protected get Childs(): GameObject[] {
         return super.Childs as GameObject[];
     }
+    public get Scene(): GameScene {
+        return this.Parent;
+    }
     public get Order(): number {
         return this._Order;
     }

@@ -15,7 +15,7 @@ export class Transform {
     }
     public set Position(value: Position) {
         this._Position = value;
-        this.Rotation = new Rotation(this._Position);
+        this.Rotation?.setCenter(this._Position);
     }
     public Rotation: Rotation;
     public Scale: number;
