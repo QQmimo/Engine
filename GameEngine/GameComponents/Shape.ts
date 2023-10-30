@@ -48,16 +48,12 @@ export class Shape extends Component {
                         );
                     }
                 });
-                if (this.StrokeColor) {
-                    this.GameObject.Layer.Context.setLineDash(this.StrokeDashTemplate || []);
-                    this.GameObject.Layer.Context.strokeStyle = this.StrokeColor;
-                    this.GameObject.Layer.Context.lineWidth = this.StrokeWidth;
-                    this.GameObject.Layer.Context.stroke();
-                }
-                if (this.BackgroundColor) {
-                    this.GameObject.Layer.Context.fillStyle = this.BackgroundColor;
-                    this.GameObject.Layer.Context.fill();
-                }
+                this.GameObject.Layer.Context.setLineDash(this.StrokeDashTemplate || []);
+                this.GameObject.Layer.Context.strokeStyle = this.StrokeColor;
+                this.GameObject.Layer.Context.lineWidth = this.StrokeWidth;
+                this.GameObject.Layer.Context.stroke();
+                this.GameObject.Layer.Context.fillStyle = this.BackgroundColor;
+                this.GameObject.Layer.Context.fill();
                 this.GameObject.Layer.Context.closePath();
             }
         }

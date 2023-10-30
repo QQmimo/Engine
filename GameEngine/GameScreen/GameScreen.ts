@@ -45,9 +45,9 @@ export class GameScreen extends BaseObject {
     public update = (): void => {
         this.Context.clearRect(0, 0, this.Canvas.width, this.Canvas.height);
         this.Childs.filter(scene => scene.IsActive).forEach(scene => {
-            // this.Context.setTransform(1, 0, 0, 1, 0, 0);
+            this.Context.setTransform(1, 0, 0, 1, 0, 0);
             scene.update();
-            // this.Context.restore();
+            this.Context.restore();
         });
     }
 

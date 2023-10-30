@@ -6,10 +6,10 @@ const SCENE: GameScene = SCREEN.addScene('game');
 const INTERFACE: GameLayer = SCENE.addLayer('interface');
 const WORLD: GameLayer = SCENE.addLayer('world');
 
-for (let i: number = 0; i < 20; i++) {
+for (let i: number = 0; i < 50; i++) {
     const target: Position = { X: Random.Integer(innerWidth), Y: Random.Integer(innerHeight) };
 
-    const obj: GameObject = new GameObject(`obj_${i}`, Shape, Movable, Collision);
+    const obj: GameObject = new GameObject(`obj_${i}`, Shape, Movable, Collision, Dictionary);
     obj.Transform.Position = { X: Random.Integer(innerWidth), Y: Random.Integer(innerHeight) };
 
     const dot: GameObject = new GameObject(`dot_${obj.Name}`, Shape);
@@ -23,18 +23,23 @@ for (let i: number = 0; i < 20; i++) {
 
     const shape: Shape = obj.getComponent(Shape);
     shape.drawByDotsCount(Random.Integer(3, 10), Random.Integer(10, 25));
-    shape.setBackground(Random.Color());
+    shape.setBackground('green');
+    shape.setStroke(1);
 
     const movable: Movable = obj.getComponent(Movable);
     movable.Speed = 1;
     movable.moveTo(target);
     movable.onStart((component, object, target) => {
         object.Transform.Rotation.rotateByPoint(target);
+        setTimeout(() => {
+            object.getComponent(Shape).setStroke(1);
+            object.getComponent(Shape).setBackground('green');
+        }, 100);
 
         const dot: GameObject = GameObject.find(`dot_${object.Name}`);
         if (dot) {
             dot.getComponent(Shape).drawCircle(5);
-            dot.getComponent(Shape).setBackground('red');
+            dot.getComponent(Shape).setBackground('black');
             dot.Transform.Position = target;
         }
 
@@ -50,6 +55,12 @@ for (let i: number = 0; i < 20; i++) {
         }
     });
     movable.onFinish((component, object) => {
+        // const dict = object.getComponent(Dictionary);
+        // if (dict.get('touched')) {
+        //     object.getComponent(Shape).setStroke(1);
+        //     object.getComponent(Shape).setBackground('green');
+        //     dict.delete('touched');
+        // }
         const target: Position = { X: Random.Integer(innerWidth), Y: Random.Integer(innerHeight) };
         component.moveTo(target);
         GameObject.find(`dot_${object.Name}`).Transform.Position = target;
@@ -58,22 +69,17 @@ for (let i: number = 0; i < 20; i++) {
     const collision: Collision = obj.getComponent(Collision);
     collision.onCollision((target, object) => {
         target.getComponent(Movable).stop(false);
-        object.getComponent(Movable).stop(false);
+        // target.getComponent(Dictionary).set('touched', 1);
+        target.getComponent(Shape).setBackground('red');
 
-        const angleOne: number = -Math.atan2(object.Transform.Position.Y - target.Transform.Position.Y, object.Transform.Position.X - target.Transform.Position.X);
-        const angleTwo: number = -Math.atan2(target.Transform.Position.Y - object.Transform.Position.Y, target.Transform.Position.X - object.Transform.Position.X);
+        const angle: number = Math.atan2(object.Transform.Position.Y - target.Transform.Position.Y, object.Transform.Position.X - target.Transform.Position.X);
         const distance: number = Distance.solve(target.Transform.Position, object.Transform.Position);
-        const pointOne: Position = {
-            X: Math.cos(angleOne) * distance + target.Transform.Position.X,
-            Y: Math.sin(angleOne) * distance + target.Transform.Position.Y
-        };
-        const pointTwo: Position = {
-            X: Math.cos(angleTwo) * distance + object.Transform.Position.X,
-            Y: Math.sin(angleTwo) * distance + object.Transform.Position.Y
+        const point: Position = {
+            X: target.Transform.Position.X - Math.cos(angle) * distance,
+            Y: target.Transform.Position.Y - Math.sin(angle) * distance
         };
 
-        target.getComponent(Movable).moveTo(pointOne);
-        object.getComponent(Movable).moveTo(pointTwo);
+        target.getComponent(Movable).moveTo(point);
     });
 
     WORLD.addObject(obj);
