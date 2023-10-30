@@ -1,61 +1,91 @@
-import { GameScreen, GameLayer, GameObject, Shape, GameScene } from "./GameEngine";
-import { Random } from "./Utilities";
+import { GameScreen, GameLayer, GameObject, Shape, GameScene, Movable, Collision, Position, Dictionary } from "./GameEngine";
+import { Distance, Random } from "./Utilities";
 
-const SCREEN: GameScreen = new GameScreen(document.body, 800, 800);
-SCREEN.Canvas.style.border = '1px solid #000';
+const SCREEN: GameScreen = new GameScreen(document.body);
 const SCENE: GameScene = SCREEN.addScene('game');
+const INTERFACE: GameLayer = SCENE.addLayer('interface');
 const WORLD: GameLayer = SCENE.addLayer('world');
 
-const count: number = 40;
-const size: number = SCREEN.Canvas.width / count;
+for (let i: number = 0; i < 20; i++) {
+    const target: Position = { X: Random.Integer(innerWidth), Y: Random.Integer(innerHeight) };
 
-const generateMaze = (count: number): boolean[][] => {
-    //Sidewinder
-    const maze: boolean[][] = [];
-    for (let row: number = 0; row < count; row++) {
-        maze[row] = [];
-        for (let col: number = 0; col < count; col++) {
-            maze[row].push(true);
-        }
-    }
+    const obj: GameObject = new GameObject(`obj_${i}`, Shape, Movable, Collision);
+    obj.Transform.Position = { X: Random.Integer(innerWidth), Y: Random.Integer(innerHeight) };
 
-    maze.forEach((row, rowIndex, maze) => {
-        if (rowIndex === 0) {
-            row.forEach((col, colIndex) => {
-                maze[rowIndex][colIndex] = false;
-            });
+    const dot: GameObject = new GameObject(`dot_${obj.Name}`, Shape);
+    const line: GameObject = new GameObject(`line_${obj.Name}`, Shape);
+    line.getComponent(Shape).drawLineTo(target);
+    line.getComponent(Shape).setStroke(1);
+    line.getComponent(Shape).setStrokeDash([5, 3]);
+    line.getComponent(Shape).setOpacity(0.35);
+    INTERFACE.addObject(dot);
+    INTERFACE.addObject(line);
+
+    const shape: Shape = obj.getComponent(Shape);
+    shape.drawByDotsCount(Random.Integer(3, 10), Random.Integer(10, 25));
+    shape.setBackground(Random.Color());
+
+    const movable: Movable = obj.getComponent(Movable);
+    movable.Speed = 1;
+    movable.moveTo(target);
+    movable.onStart((component, object, target) => {
+        object.Transform.Rotation.rotateByPoint(target);
+
+        const dot: GameObject = GameObject.find(`dot_${object.Name}`);
+        if (dot) {
+            dot.getComponent(Shape).drawCircle(5);
+            dot.getComponent(Shape).setBackground('red');
+            dot.Transform.Position = target;
         }
-        else {
-            let step: number = 0;
-            do {
-                maze[rowIndex][step] = Random.Boolean();
-                if (maze[rowIndex][step]) {
-                    maze[rowIndex][Random.Integer(0, step)] = false;
-                    step = maze.length;
-                }
-                step++;
-            } while (step < maze.length);
+
+        const line: GameObject = GameObject.find(`line_${object.Name}`);
+        if (line) {
+            line.getComponent(Shape).drawLineTo(target);
         }
     });
+    movable.onMove((component, object, target) => {
+        const line: GameObject = GameObject.find(`line_${object.Name}`);
+        if (line) {
+            line.Transform.Position = object.Transform.Position;
+        }
+    });
+    movable.onFinish((component, object) => {
+        const target: Position = { X: Random.Integer(innerWidth), Y: Random.Integer(innerHeight) };
+        component.moveTo(target);
+        GameObject.find(`dot_${object.Name}`).Transform.Position = target;
+    });
 
-    return maze;
+    const collision: Collision = obj.getComponent(Collision);
+    collision.onCollision((target, object) => {
+        target.getComponent(Movable).stop(false);
+        object.getComponent(Movable).stop(false);
+
+        const angleOne: number = -Math.atan2(object.Transform.Position.Y - target.Transform.Position.Y, object.Transform.Position.X - target.Transform.Position.X);
+        const angleTwo: number = -Math.atan2(target.Transform.Position.Y - object.Transform.Position.Y, target.Transform.Position.X - object.Transform.Position.X);
+        const distance: number = Distance.solve(target.Transform.Position, object.Transform.Position);
+        const pointOne: Position = {
+            X: Math.cos(angleOne) * distance + target.Transform.Position.X,
+            Y: Math.sin(angleOne) * distance + target.Transform.Position.Y
+        };
+        const pointTwo: Position = {
+            X: Math.cos(angleTwo) * distance + object.Transform.Position.X,
+            Y: Math.sin(angleTwo) * distance + object.Transform.Position.Y
+        };
+
+        target.getComponent(Movable).moveTo(pointOne);
+        object.getComponent(Movable).moveTo(pointTwo);
+    });
+
+    WORLD.addObject(obj);
 }
 
-generateMaze(count).forEach((row, rowIndex) => {
-    row.forEach((col, colIndex) => {
-        if (col) {
-            const cube: GameObject = new GameObject(`cube_${rowIndex}_${colIndex}`, Shape);
-            cube.Transform.Rotation.rotateByDegree(45);
-            cube.Transform.Position = { X: colIndex * size + size / 2, Y: rowIndex * size + size / 2 };
-
-            const shape: Shape = cube.getComponent(Shape);
-            shape.drawByDotsCount(4, Math.sqrt(Math.pow(size / 2, 2) + Math.pow(size / 2, 2)));
-            shape.setBackground('red');
-
-            WORLD.addObject(cube);
-        }
-    });
-});
-
-
 SCREEN.play();
+
+document.body.addEventListener('keypress', (e) => {
+    if ((e.key === 'Spacebar' || e.key === ' ') && INTERFACE.IsHidden) {
+        INTERFACE.IsHidden = false;
+    }
+    else if ((e.key === 'Spacebar' || e.key === ' ') && !INTERFACE.IsHidden) {
+        INTERFACE.IsHidden = true;
+    }
+})

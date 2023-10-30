@@ -1,7 +1,6 @@
 import { BaseObject } from "../BaseObject";
 import { GameObject } from "../GameObject";
 import { GameScene } from "../GameScene";
-import { GameScreen } from "../GameScreen";
 
 export class GameLayer extends BaseObject {
     constructor(name: string, scene: GameScene) {
@@ -26,6 +25,8 @@ export class GameLayer extends BaseObject {
         this.Parent.sortLayers();
     }
 
+    public IsHidden: boolean = false;
+
     public readonly Context: CanvasRenderingContext2D;
 
     public addObject = (gameObject: GameObject): void => {
@@ -34,7 +35,7 @@ export class GameLayer extends BaseObject {
 
     public update = (): void => {
         this.Childs.forEach(gameObject => {
-            if (gameObject.broadcast) {
+            if (gameObject.broadcast && this.IsHidden === false) {
                 gameObject.broadcast('update');
             }
         });
