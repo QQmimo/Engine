@@ -33,6 +33,11 @@ export class GameObject extends BaseObject {
         return found;
     }
 
+    public tryGetComponent = <T extends Component>(type: { new(gameObject: GameObject): T }): T => {
+        const found: T = this.Components.get(type.name) as T;
+        return found;
+    }
+
     public detachComponent = <T extends Component>(type: { new(gameObject: GameObject): T }): void => {
         this.Components.delete(type.name);
     }
@@ -73,6 +78,6 @@ export class GameObject extends BaseObject {
     }
 
     public static findByComponent(component: typeof Component): GameObject[] {
-        return Array.from(super.BaseObjects, ([key, value]) => value).filter(obj => obj instanceof GameObject && obj.getComponent(component)) as GameObject[];
+        return Array.from(super.BaseObjects, ([key, value]) => value).filter(obj => obj instanceof GameObject && obj.tryGetComponent(component)) as GameObject[];
     }
 }
