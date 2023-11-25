@@ -1,5 +1,3 @@
-export * from './GameScreen';
-export * from './GameLayer';
-export * from './GameObject';
-export * from './GameComponents';
-export * from './GameScene';
+export * as Core from './Core';
+export * as Utilities from './Utilities';
+export * as Components from './Components';
