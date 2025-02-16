@@ -7,34 +7,45 @@ const gameScene: GameScene = gameScreen.addScene('game');
 const uix: GameLayer = gameScene.addLayer('uix');
 const gameLayer: GameLayer = gameScene.addLayer('world');
 
+const generateShaper = (object: GameObject, size: number = 10): void => {
+    object.Transform.Rotation = Random.Angle();
+    object.getComponent(Shape).drawByDotsCount(Random.Integer(3, 10), Random.Integer(5, 10) * size);
+    object.getComponent(Move).Speed = Random.Integer(5, 50);
+    object.getComponent(Move).moveTo(new Vector2D(Random.Integer(innerWidth), Random.Integer(innerHeight)));
+}
+
 const drawObjects = (count: number, size: number = 10): void => {
+
     for (let i: number = 0; i < count; i++) {
         const cube: GameObject = new GameObject('cube', Move, Shape, Physic, Dictionary);
         cube.Transform.Position = new Vector2D(Random.Integer(innerWidth), Random.Integer(innerHeight));
-        cube.getComponent(Move).Speed = Random.Integer(5, 50);
+        generateShaper(cube, size);
         cube.getComponent(Move).onStart((object, component) => {
             object.Transform.Rotation = Random.Angle();
             object.getComponent(Shape).drawByDotsCount(Random.Integer(3, 10), Random.Integer(5, 10) * size);
             object.getComponent(Shape).FillStyle = { Color: 'green' };
         });
         cube.getComponent(Physic).onCollision((object1, object2) => {
-            console.log(`${object1.Name} and ${object2.Name} is smashed!`);
             object1.getComponent(Move).stop();
-            object1.getComponent(Shape).FillStyle = { Color: 'red' };
             object2.getComponent(Move).stop();
-            object2.getComponent(Shape).FillStyle = { Color: 'red' };
         });
-        cube.getComponent(Move).onFinish((object, component) => {
+        cube.getComponent(Move).onStop((object, component) => {
+            object.getComponent(Shape).FillStyle = { Color: 'red' };
             if (!object.getComponent(Dictionary).get('wait')) {
                 object.getComponent(Dictionary).set('wait', true);
                 setTimeout(() => {
-                    object.Transform.Rotation = Random.Angle();
-                    object.getComponent(Shape).drawByDotsCount(Random.Integer(3, 10), Random.Integer(5, 10) * size);
-                    object.getComponent(Move).Speed = Random.Integer(5, 50);
-                    object.getComponent(Move).moveTo(new Vector2D(Random.Integer(innerWidth), Random.Integer(innerHeight)));
+                    let new_size: number  = object.getComponent(Dictionary).get('size') as number ?? size;
+                    object.getComponent(Dictionary).set('size', new_size - 0.5  < 1 ? 1 : new_size - 0.5);
+                    generateShaper(object, object.getComponent(Dictionary).get('size') as number);
                     object.getComponent(Dictionary).set('wait', false);
                 }, 2000);
             }
+        });
+        cube.getComponent(Move).onFinish((object, component) => {
+            object.getComponent(Shape).FillStyle = { Color: 'gray' };
+            setTimeout(() => {
+                generateShaper(object, size);
+            }, 2000);
         });
         cube.getComponent(Move).onMove((object, component) => {
             (object.getComponent(Dictionary).get('line') as GameObject)?.destroy();
@@ -44,7 +55,6 @@ const drawObjects = (count: number, size: number = 10): void => {
             uix.addGameObject(line);
             object.getComponent(Dictionary).set('line', line);
         });
-        cube.getComponent(Move).moveTo(new Vector2D(Random.Integer(innerWidth), Random.Integer(innerHeight)));
 
         gameLayer.addGameObject(cube);
     }

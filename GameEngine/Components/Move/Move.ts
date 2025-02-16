@@ -5,6 +5,7 @@ export class Move extends GameComponent {
     private _onStart?(object: GameObject, component: Move): void;
     private _onFinish?(object: GameObject, component: Move): void;
     private _onMove?(object: GameObject, component: Move): void;
+    private _onStop?(object: GameObject, component: Move): void;
     private _MoveAngle: Angle = new Angle(0);
     private _StartTravell: boolean = false;
 
@@ -29,12 +30,15 @@ export class Move extends GameComponent {
     public stop = (): void => {
         this.Target = undefined;
         this._StartTravell = false;
-        if (this._onFinish) {
-            this._onFinish(this.GameObject, this);
+        if (this._onStop) {
+            this._onStop(this.GameObject, this);
         }
     }
     public onStart = (action: (object: GameObject, component: Move) => void): void => {
         this._onStart = action;
+    }
+    public onStop = (action: (object: GameObject, component: Move) => void): void => {
+        this._onStop = action;
     }
     public onFinish = (action: (object: GameObject, component: Move) => void): void => {
         this._onFinish = action;
@@ -50,6 +54,9 @@ export class Move extends GameComponent {
         if (this.GameObject.Transform.Position.X === this.Target?.X
             && this.GameObject.Transform.Position.Y === this.Target?.Y) {
             this.stop();
+            if (this._onFinish) {
+                this._onFinish(this.GameObject, this);
+            }
             return;
         }
         if (this.IsPause === false && this.IsMoving) {
@@ -62,6 +69,9 @@ export class Move extends GameComponent {
             const direction: Vector2D = this.Target.subtract(this.GameObject.Transform.Position);
             if (direction.length() < 1) {
                 this.stop();
+                if (this._onFinish) {
+                    this._onFinish(this.GameObject, this);
+                }
                 return;
             }
             const normilize: Vector2D = direction.normalize();
