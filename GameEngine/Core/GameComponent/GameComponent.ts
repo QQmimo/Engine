@@ -10,5 +10,5 @@ export class GameComponent {
         return this.GameObject.Scene.IsPause;
     }
 
-    public update?: () => void;
+    public update?: (deltaTime: number) => void;
 }

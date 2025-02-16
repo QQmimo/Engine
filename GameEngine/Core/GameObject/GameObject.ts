@@ -45,7 +45,7 @@ export class GameObject extends BaseObject {
                     if (component[methodName].length !== args.length) {
                         throw new Error(`ОШИБКА: Метод '${methodName}' в компоненте '${component.constructor.name}' количество переданных аргументов (${args.length}) не соответствует ожидаемому (${component[methodName].length})`);
                     }
-                    all.push(component[methodName].apply(this, ...args));
+                    all.push(component[methodName].apply(this, [...args]));
                 });
             await Promise.all(all);
         }

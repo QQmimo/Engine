@@ -1,9 +1,9 @@
-import { Angle, Point } from "../../../Utilities";
+import { Angle, Point, Vector2D } from "../../../Utilities";
 import { GameObject } from "../GameObject";
 
 export class Transform {
     constructor(gameObject: GameObject) {
-        this.Position = { X: 0, Y: 0 };
+        this.Position = new Vector2D(0, 0);
         this.Rotation = new Angle(0);
         this.Scale = 1;
         this._GameObject = gameObject;
@@ -11,7 +11,7 @@ export class Transform {
 
     private _GameObject: GameObject;
 
-    public Position: Point;
+    public Position: Vector2D;
     public Rotation: Angle;
     public Scale: number;
 

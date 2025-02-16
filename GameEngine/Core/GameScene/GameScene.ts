@@ -29,10 +29,10 @@ export class GameScene extends BaseObject {
         layer.Order = this.Childs.length;
         return layer;
     }
-    public update = async (): Promise<void> => {
+    public update = async (deltaTime: number): Promise<void> => {
         const all: Promise<void>[] = [];
         this.Childs.forEach(layer => {
-            all.push(layer.update());
+            all.push(layer.update(deltaTime));
         });
         await Promise.all(all);
     }

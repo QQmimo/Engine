@@ -1,24 +1,24 @@
 import { GameComponent, GameObject } from "../../Core";
-import { Angle, Point } from "../../Utilities";
+import { Angle, Point, Vector2D } from "../../Utilities";
 
 export class Move extends GameComponent {
     private _onStart?(object: GameObject, component: Move): void;
     private _onFinish?(object: GameObject, component: Move): void;
     private _onMove?(object: GameObject, component: Move): void;
-    private _IsMoving: boolean = false;
     private _MoveAngle: Angle = new Angle(0);
+    private _StartTravell: boolean = false;
 
-    public Speed: number = 0;
-    public Target: Point;
+    public Speed: number;
+    public Target: Vector2D;
     public get MoveAngle(): Angle {
         return this._MoveAngle;
     }
     public get IsMoving(): boolean {
-        return this._IsMoving;
+        return this.Target !== undefined;
     }
     public moveTo(gameObject: GameObject): void
-    public moveTo(point: Point): void
-    public moveTo(gameObjectOrPoint: GameObject | Point): void {
+    public moveTo(point: Vector2D): void
+    public moveTo(gameObjectOrPoint: GameObject | Vector2D): void {
         if (gameObjectOrPoint instanceof GameObject) {
             this.Target = gameObjectOrPoint.Transform.Position;
         }
@@ -28,6 +28,10 @@ export class Move extends GameComponent {
     }
     public stop = (): void => {
         this.Target = undefined;
+        this._StartTravell = false;
+        if (this._onFinish) {
+            this._onFinish(this.GameObject, this);
+        }
     }
     public onStart = (action: (object: GameObject, component: Move) => void): void => {
         this._onStart = action;
@@ -38,38 +42,30 @@ export class Move extends GameComponent {
     public onMove = (action: (object: GameObject, component: Move) => void): void => {
         this._onMove = action;
     }
-    public update = async (): Promise<void> => {
-        if (this.IsPause === false
-            && this.Target !== undefined
-            && (this.Target.X !== this.GameObject.Transform.Position.X
-                || this.Target.Y !== this.GameObject.Transform.Position.Y)) {
+    public update = async (deltaTime: number): Promise<void> => {
+        if (this._onStart && this.IsMoving && !this._StartTravell) {
+            this._StartTravell = true;
+            this._onStart(this.GameObject, this);
+        }
+        if (this.GameObject.Transform.Position.X === this.Target?.X
+            && this.GameObject.Transform.Position.Y === this.Target?.Y) {
+            this.stop();
+            return;
+        }
+        if (this.IsPause === false && this.IsMoving) {
             this._MoveAngle = Angle.byPoints(this.GameObject, this.Target);
-
-            if (this._onStart && this._IsMoving === false) {
-                this._onStart(this.GameObject, this);
-            }
-
-            this._IsMoving = true;
-            const stepX: number = Math.cos(this._MoveAngle.toRadian()) * this.Speed;
-            const stepY: number = Math.sin(this._MoveAngle.toRadian()) * this.Speed;
-            this.GameObject.Transform.Position.X += stepX;
-            this.GameObject.Transform.Position.Y += stepY;
-
-            if (Math.abs(this.GameObject.Transform.Position.X - this.Target.X) < stepX) {
-                this.GameObject.Transform.Position.X = this.Target.X;
-            }
-            if (Math.abs(this.GameObject.Transform.Position.Y - this.Target.Y) < stepY) {
-                this.GameObject.Transform.Position.Y = this.Target.Y;
-            }
 
             if (this._onMove) {
                 this._onMove(this.GameObject, this);
             }
-        }
-        else if (this.Target !== undefined && this._onFinish) {
-            this.Target = undefined;
-            this._IsMoving = false;
-            this._onFinish(this.GameObject, this);
+
+            const direction: Vector2D = this.Target.subtract(this.GameObject.Transform.Position);
+            if (direction.length() < 1) {
+                this.stop();
+                return;
+            }
+            const normilize: Vector2D = direction.normalize();
+            this.GameObject.Transform.Position = this.GameObject.Transform.Position.add(normilize.multiply(this.Speed * deltaTime));
         }
     }
 }

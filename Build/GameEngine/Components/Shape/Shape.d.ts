@@ -1,5 +1,5 @@
 import { GameComponent } from "../../Core";
-import { Point } from "../../Utilities";
+import { Vector2D } from "../../Utilities";
 import { FillStyle, LineStyle } from "./Properties";
 export declare class Shape extends GameComponent {
     private _Dots;
@@ -10,11 +10,11 @@ export declare class Shape extends GameComponent {
     get LineStyle(): LineStyle;
     set FillStyle(value: FillStyle);
     get FillStyle(): FillStyle;
-    get Dots(): Point[];
+    get Dots(): Vector2D[];
     clearLineStyle: () => void;
     clearFillStyle: () => void;
-    draw: (...dots: Point[]) => void;
-    drawByDotsCount: (count: number, distance: number) => void;
-    drawLine: (pointA: Point, pointB: Point) => void;
-    update: () => Promise<void>;
+    draw: (...dots: Vector2D[]) => void;
+    drawByDotsCount: (count: number, size: number) => void;
+    drawLine: (pointA: Vector2D, pointB: Vector2D) => void;
+    update: (deltaTime: number) => Promise<void>;
 }

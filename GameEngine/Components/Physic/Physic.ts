@@ -32,9 +32,9 @@ export class Physic extends GameComponent {
     private _onCollision: (objectA: GameObject, objectB: GameObject) => void;
     private _Neighbours: GameObject[] = [];
 
-    public update = (): void => {
+    public update = (deltaTime: number): void => {
         if ((this.GameObject.tryGetComponent(Move)?.IsMoving ?? false) && this._onCollision) {
-            this._Neighbours = GameObject.findByComponent(Physic).filter(object => object.Id !== this.GameObject.Id);//this._solveNeighbours();
+            this._Neighbours = this._solveNeighbours();
             this._Neighbours.forEach(neighbour => {
                 if (this.check(this.GameObject, neighbour)) {
                     this._onCollision(this.GameObject, neighbour);
@@ -53,8 +53,8 @@ export class Physic extends GameComponent {
         const axes = this._getAxes(objectA).concat(this._getAxes(objectB));
 
         for (const axis of axes) {
-            const proj1 = this.project(objectA, axis);
-            const proj2 = this.project(objectB, axis);
+            const proj1 = this._project(objectA, axis);
+            const proj2 = this._project(objectB, axis);
 
             if (!this._overlaps(proj1, proj2)) {
                 return false;
@@ -64,7 +64,7 @@ export class Physic extends GameComponent {
         return true;
     }
 
-    private project(object: GameObject, axis: Point): { min: number; max: number } {
+    private _project(object: GameObject, axis: Point): { min: number; max: number } {
         let min = Infinity;
         let max = -Infinity;
     

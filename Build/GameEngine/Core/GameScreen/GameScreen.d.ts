@@ -2,6 +2,7 @@ import { BaseObject } from "../BaseObject";
 import { GameScene } from "../GameScene";
 export declare class GameScreen extends BaseObject {
     constructor(target: HTMLElement, width?: number, height?: number);
+    private _LastTime;
     private _Times;
     private _IsShowFps;
     private _resizeCanvas;
@@ -17,9 +18,9 @@ export declare class GameScreen extends BaseObject {
     get Scenes(): GameScene[];
     addScene: (name: string) => GameScene;
     removeScene: (name: string) => void;
-    update: () => Promise<void>;
-    showFps: (status?: boolean) => void;
-    play: () => void;
+    update: (deltaTime: number) => Promise<void>;
+    fps: (status?: boolean) => void;
+    play: (currentTime?: number) => void;
     pause: () => void;
     static findSceneByName(name: string): GameScene | undefined;
     static findById(id: string): GameScreen | undefined;

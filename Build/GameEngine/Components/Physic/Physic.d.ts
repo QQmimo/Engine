@@ -5,10 +5,11 @@ export declare class Physic extends GameComponent {
     private _onNeighboursChange;
     private _onCollision;
     private _Neighbours;
-    update: () => void;
+    update: (deltaTime: number) => void;
     onCollision: (action: (objectA: GameObject, objectB: GameObject) => void) => void;
     onNeighboursChange: (count: number, action: (gameObject: GameObject, neighbours: GameObject[]) => void) => void;
-    private static _getFarthestPoint;
-    private static _getSupportPoint;
-    static check(objectA: GameObject, objectB: GameObject): boolean;
+    check(objectA: GameObject, objectB: GameObject): boolean;
+    private _project;
+    private _overlaps;
+    private _getAxes;
 }

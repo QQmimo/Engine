@@ -14,7 +14,7 @@ export declare class GameLayer extends BaseObject {
     get Screen(): GameScreen | undefined;
     get GameObjects(): GameObject[];
     addGameObject: (gameObject: GameObject) => void;
-    update: () => Promise<void>;
+    update: (deltaTime: number) => Promise<void>;
     static findById(id: string): GameLayer | undefined;
     static findByName(name: string): GameLayer;
     static findByTag(tag: string): GameLayer[];

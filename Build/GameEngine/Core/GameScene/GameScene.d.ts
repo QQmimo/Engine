@@ -10,7 +10,7 @@ export declare class GameScene extends BaseObject {
     get Layers(): GameLayer[];
     get Screen(): GameScreen | undefined;
     addLayer: (name: string) => GameLayer;
-    update: () => Promise<void>;
+    update: (deltaTime: number) => Promise<void>;
     play: () => void;
     pause: () => void;
     static findById(id: string): BaseObject | undefined;

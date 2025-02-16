@@ -1,9 +1,9 @@
-import { Angle, Point } from "../../../Utilities";
+import { Angle, Point, Vector2D } from "../../../Utilities";
 import { GameObject } from "../GameObject";
 export declare class Transform {
     constructor(gameObject: GameObject);
     private _GameObject;
-    Position: Point;
+    Position: Vector2D;
     Rotation: Angle;
     Scale: number;
     rotateToPoint(point: Point): void;

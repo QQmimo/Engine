@@ -52,11 +52,11 @@ export class GameLayer extends BaseObject {
     public addGameObject = (gameObject: GameObject): void => {
         gameObject.setLayer(this);
     }
-    public update = async (): Promise<void> => {
+    public update = async (deltaTime: number): Promise<void> => {
         const all: Promise<void>[] = [];
         this.Childs.forEach(object => {
             if (object.broadcast && this.IsHidden === false) {
-                all.push(object.broadcast('update'));
+                all.push(object.broadcast('update', deltaTime));
             }
         });
         await Promise.all(all);

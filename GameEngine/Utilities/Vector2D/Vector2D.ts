@@ -14,7 +14,20 @@ export class Vector2D extends Point {
         return new Vector2D(this.X + vector.X, this.Y + vector.Y);
     }
 
+    public subtract(vector: Vector2D): Vector2D {
+        return new Vector2D(this.X - vector.X, this.Y - vector.Y);
+    }
+
+    public normalize(): Vector2D {
+        const length = this.length();
+        return new Vector2D(this.X / length, this.Y / length);
+    }
+
     public multiply(scalar: number): Vector2D {
         return new Vector2D(this.X * scalar, this.Y * scalar);
+    }
+
+    public length(): number {
+        return Math.sqrt(this.X * this.X + this.Y * this.Y);
     }
 }

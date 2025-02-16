@@ -21,6 +21,7 @@ export class GameScreen extends BaseObject {
         target.appendChild(this.Canvas);
     }
 
+    private _LastTime: number = 0;
     private _Times: number[];
     private _IsShowFps: boolean;
     private _resizeCanvas = (): void => {
@@ -69,20 +70,20 @@ export class GameScreen extends BaseObject {
     public removeScene = (name: string): void => {
         GameScene.findByName(name)?.destroy();
     }
-    public update = async (): Promise<void> => {
+    public update = async (deltaTime: number): Promise<void> => {
         const all: Promise<void>[] = [];
         this.Context.clearRect(0, 0, this.Width, this.Height);
         this.Childs.filter(scene => scene.IsActive).forEach(scene => {
             this.Context.setTransform(1, 0, 0, 1, 0, 0);
-            all.push(scene.update());
+            all.push(scene.update(deltaTime));
             this.Context.restore();
         });
         if (this._IsShowFps) {
-            this.showFps(this._IsShowFps);
+            this.fps(this._IsShowFps);
         }
         await Promise.all(all);
     }
-    public showFps = (status: boolean = false): void => {
+    public fps = (status: boolean = false): void => {
         this._IsShowFps = status;
         if (this._IsShowFps) {
             this.Context.beginPath();
@@ -102,8 +103,10 @@ export class GameScreen extends BaseObject {
             this.Context.closePath();
         }
     }
-    public play = (): void => {
-        this.update();
+    public play = (currentTime: number = 0): void => {
+        const deltaTime = (currentTime - this._LastTime) / 1000;
+        this._LastTime = currentTime;
+        this.update(deltaTime);
         this.Loop = requestAnimationFrame(this.play);
     }
     public pause = (): void => {
