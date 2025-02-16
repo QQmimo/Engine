@@ -9,17 +9,17 @@ const gameLayer: GameLayer = gameScene.addLayer('world');
 
 const generateShaper = (object: GameObject, size: number = 10): void => {
     object.Transform.Rotation = Random.Angle();
-    object.getComponent(Shape).drawByDotsCount(Random.Integer(3, 10), Random.Integer(5, 10) * size);
+    object.getComponent(Dictionary).set('size', size);
+    object.getComponent(Shape).drawByDotsCount(Random.Integer(3, 10), size);
     object.getComponent(Move).Speed = Random.Integer(5, 50);
     object.getComponent(Move).moveTo(new Vector2D(Random.Integer(innerWidth), Random.Integer(innerHeight)));
 }
 
 const drawObjects = (count: number, size: number = 10): void => {
-
     for (let i: number = 0; i < count; i++) {
         const cube: GameObject = new GameObject('cube', Move, Shape, Physic, Dictionary);
         cube.Transform.Position = new Vector2D(Random.Integer(innerWidth), Random.Integer(innerHeight));
-        generateShaper(cube, size);
+        generateShaper(cube, Random.Integer(5, 10) * size);
         cube.getComponent(Move).onStart((object, component) => {
             object.Transform.Rotation = Random.Angle();
             object.getComponent(Shape).drawByDotsCount(Random.Integer(3, 10), Random.Integer(5, 10) * size);
@@ -31,12 +31,11 @@ const drawObjects = (count: number, size: number = 10): void => {
         });
         cube.getComponent(Move).onStop((object, component) => {
             object.getComponent(Shape).FillStyle = { Color: 'red' };
-            if (!object.getComponent(Dictionary).get('wait')) {
+            if (!object.getComponent(Dictionary).get<boolean>('wait')) {
                 object.getComponent(Dictionary).set('wait', true);
                 setTimeout(() => {
-                    let new_size: number  = object.getComponent(Dictionary).get('size') as number ?? size;
-                    object.getComponent(Dictionary).set('size', new_size - 0.5  < 1 ? 1 : new_size - 0.5);
-                    generateShaper(object, object.getComponent(Dictionary).get('size') as number);
+                    const new_size: number = object.getComponent(Dictionary).get<number>('size');
+                    generateShaper(object, new_size - 1 < 1 ? 1 : new_size - 1);
                     object.getComponent(Dictionary).set('wait', false);
                 }, 2000);
             }
@@ -44,7 +43,7 @@ const drawObjects = (count: number, size: number = 10): void => {
         cube.getComponent(Move).onFinish((object, component) => {
             object.getComponent(Shape).FillStyle = { Color: 'gray' };
             setTimeout(() => {
-                generateShaper(object, size);
+                generateShaper(object, Random.Integer(5, 10) * size);
             }, 2000);
         });
         cube.getComponent(Move).onMove((object, component) => {
@@ -60,7 +59,7 @@ const drawObjects = (count: number, size: number = 10): void => {
     }
 }
 
-drawObjects(15, 5);
+drawObjects(25, 5);
 
 gameScreen.fps(true);
 gameScreen.play();

@@ -3,11 +3,11 @@ import { GameComponent } from "../../Core";
 export class Dictionary extends GameComponent {
     private Dictionary: Map<string, unknown> = new Map();
 
-    public set(key: string, value: unknown): void {
+    public set<T>(key: string, value: T): void {
         this.Dictionary.set(key, value);
     }
-    public get(key: string): unknown {
-        return this.Dictionary.get(key);
+    public get<T>(key: string): T {
+        return this.Dictionary.get(key) as T;
     }
     public delete(key: string): void {
         this.Dictionary.delete(key);

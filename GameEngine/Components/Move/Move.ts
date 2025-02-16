@@ -1,5 +1,5 @@
 import { GameComponent, GameObject } from "../../Core";
-import { Angle, Point, Vector2D } from "../../Utilities";
+import { Angle, Vector2D } from "../../Utilities";
 
 export class Move extends GameComponent {
     private _onStart?(object: GameObject, component: Move): void;

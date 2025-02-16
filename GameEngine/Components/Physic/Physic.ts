@@ -67,24 +67,24 @@ export class Physic extends GameComponent {
     private _project(object: GameObject, axis: Point): { min: number; max: number } {
         let min = Infinity;
         let max = -Infinity;
-    
+
         for (const vertex of object.tryGetComponent(Shape)?.Dots ?? []) {
             const projection = axis.X * vertex.X + axis.Y * vertex.Y;
             min = Math.min(min, projection);
             max = Math.max(max, projection);
         }
-    
+
         return { min, max };
     }
 
     private _overlaps(proj1: { min: number; max: number }, proj2: { min: number; max: number }): boolean {
         return proj1.max >= proj2.min && proj2.max >= proj1.min;
-    } 
+    }
 
     private _getAxes(object: GameObject): Point[] {
         const axes: Point[] = [];
         const vertices = object.tryGetComponent(Shape)?.Dots ?? [];
-    
+
         for (let i = 0; i < vertices.length; i++) {
             const p1 = vertices[i];
             const p2 = vertices[(i + 1) % vertices.length];
@@ -93,7 +93,7 @@ export class Physic extends GameComponent {
             const length: number = Math.sqrt(normal.X ** 2 + normal.Y ** 2);
             axes.push({ X: normal.X / length, Y: normal.Y / length });
         }
-    
+
         return axes;
     }
 }
