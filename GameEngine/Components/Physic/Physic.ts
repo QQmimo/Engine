@@ -1,8 +1,7 @@
 import { GameComponent, GameObject } from "../../Core";
-import { Distance, Point, Vector } from "../../Utilities";
+import { Distance, Point } from "../../Utilities";
 import { Move } from "../Move";
 import { Shape } from "../Shape";
-import { Simplex } from "./Properties";
 
 export class Physic extends GameComponent {
     private _solveNeighbours = (): GameObject[] => {
@@ -34,10 +33,10 @@ export class Physic extends GameComponent {
     private _Neighbours: GameObject[] = [];
 
     public update = (): void => {
-        if (this._onCollision && (this.GameObject.tryGetComponent(Move)?.IsMoving ?? false)) {
-            this._Neighbours = this._solveNeighbours();
+        if ((this.GameObject.tryGetComponent(Move)?.IsMoving ?? false) && this._onCollision) {
+            this._Neighbours = GameObject.findByComponent(Physic).filter(object => object.Id !== this.GameObject.Id);//this._solveNeighbours();
             this._Neighbours.forEach(neighbour => {
-                if (Physic.check(this.GameObject, neighbour)) {
+                if (this.check(this.GameObject, neighbour)) {
                     this._onCollision(this.GameObject, neighbour);
                 }
             });
@@ -50,44 +49,51 @@ export class Physic extends GameComponent {
         this._NeighboursCount = count;
         this._onNeighboursChange = action;
     }
+    public check(objectA: GameObject, objectB: GameObject): boolean {
+        const axes = this._getAxes(objectA).concat(this._getAxes(objectB));
 
+        for (const axis of axes) {
+            const proj1 = this.project(objectA, axis);
+            const proj2 = this.project(objectB, axis);
 
-    private static _getFarthestPoint(object: GameObject, direction: Vector): Vector {
-        let distance: number = undefined;
-        let farPoint: Point = { X: 0, Y: 0 };
-        const shape: Shape = object.getComponent(Shape);
-        shape.Dots.forEach(dot => {
-            const distaneInDirection: number = direction.multyply(new Vector(dot));
-            if (!distance || distance < distaneInDirection) {
-                farPoint = dot;
-                distance = distaneInDirection;
-            }
-        });
-        return new Vector(farPoint);
-    }
-    private static _getSupportPoint(objectA: GameObject, objectB: GameObject, direction: Vector): Vector {
-        const farthestPointA: Vector = this._getFarthestPoint(objectA, direction);
-        const farthestPointB: Vector = this._getFarthestPoint(objectB, direction);
-        return farthestPointA.sub(farthestPointB);
-    }
-    public static check(objectA: GameObject, objectB: GameObject): boolean {
-        const simplex: Simplex = new Simplex();
-        let direction: Vector = new Vector(0, 1);
-        const supportPoint: Vector = this._getSupportPoint(objectA, objectB, direction);
-        simplex.add(supportPoint);
-        direction = direction.invert();
-
-        while (direction) {
-            const supportPoint: Vector = this._getSupportPoint(objectA, objectB, direction);
-
-            if (supportPoint.multyply(direction!) <= 0) {
+            if (!this._overlaps(proj1, proj2)) {
                 return false;
             }
-
-            simplex.add(supportPoint);
-            direction = simplex.calculateDirection();
         }
 
         return true;
+    }
+
+    private project(object: GameObject, axis: Point): { min: number; max: number } {
+        let min = Infinity;
+        let max = -Infinity;
+    
+        for (const vertex of object.tryGetComponent(Shape)?.Dots ?? []) {
+            const projection = axis.X * vertex.X + axis.Y * vertex.Y;
+            min = Math.min(min, projection);
+            max = Math.max(max, projection);
+        }
+    
+        return { min, max };
+    }
+
+    private _overlaps(proj1: { min: number; max: number }, proj2: { min: number; max: number }): boolean {
+        return proj1.max >= proj2.min && proj2.max >= proj1.min;
+    } 
+
+    private _getAxes(object: GameObject): Point[] {
+        const axes: Point[] = [];
+        const vertices = object.tryGetComponent(Shape)?.Dots ?? [];
+    
+        for (let i = 0; i < vertices.length; i++) {
+            const p1 = vertices[i];
+            const p2 = vertices[(i + 1) % vertices.length];
+            const edge: Point = { X: p2.X - p1.X, Y: p2.Y - p1.Y };
+            const normal: Point = { X: -edge.Y, Y: edge.X };
+            const length: number = Math.sqrt(normal.X ** 2 + normal.Y ** 2);
+            axes.push({ X: normal.X / length, Y: normal.Y / length });
+        }
+    
+        return axes;
     }
 }

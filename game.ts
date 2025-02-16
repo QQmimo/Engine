@@ -14,40 +14,30 @@ const drawArrows = (count: number, point?: Point, size?: number): void => {
         cube.getComponent(Move).moveTo({ X: Random.Integer(innerWidth), Y: Random.Integer(innerHeight) });
         cube.getComponent(Move).onStart((object, component) => {
             object.Transform.rotateToPoint(component.Target);
-            object.getComponent(Shape).drawByDotsCount(5, size ?? Random.Integer(10, 25));
+            object.getComponent(Shape).drawByDotsCount(Random.Integer(3, 10), size ?? Random.Integer(5, 10));
             object.getComponent(Shape).FillStyle = { Color: 'green' };
             object.getComponent(Move).Speed = 1;
             object.setLayer(gameLayer);
         });
-        cube.getComponent(Move).onFinish((object, component) => {
-            object.getComponent(Shape).FillStyle = { Color: 'red' };
-            object.setLayer(interfaceLayer);
+        cube.getComponent(Physic).onCollision((object1, object2) => {
+            object1.getComponent(Move).stop();
+            object1.getComponent(Shape).FillStyle = { Color: 'red' };
+            object2.getComponent(Move).stop();
+            object2.getComponent(Shape).FillStyle = { Color: 'red' };
+        });
+        cube.getComponent(Move).onFinish((object) => {
+            console.log(`${object.Id} is stop!`);
             setTimeout(() => {
-                component.moveTo({ X: Random.Integer(innerWidth), Y: Random.Integer(innerHeight) });
+                object.getComponent(Shape).drawByDotsCount(Random.Integer(3, 10), size ?? Random.Integer(5, 10));
+                object.getComponent(Move).moveTo({ X: Random.Integer(innerWidth), Y: Random.Integer(innerHeight) });
             }, 2000);
         });
-        // cube.getComponent(Physic).onCollision((objectA, objectB) => {
-        //     const distance: number = Distance.solve(objectA, objectB);
-        //     const angleTargetA: number = Angle.byPoints(objectA, objectB).toRadian();
-        //     const angleTargetB: number = Angle.byPoints(objectB, objectA).toRadian();
-        //     const pointTargetA: Point = {
-        //         X: objectA.Transform.Position.X - Math.cos(angleTargetA) * distance,
-        //         Y: objectA.Transform.Position.Y - Math.sin(angleTargetA) * distance
-        //     };
-        //     const pointTargetB: Point = {
-        //         X: objectB.Transform.Position.X - Math.cos(angleTargetB) * distance,
-        //         Y: objectB.Transform.Position.Y - Math.sin(angleTargetB) * distance
-        //     };
-
-        //     objectA.tryGetComponent(Move)?.moveTo(pointTargetA);
-        //     objectB.tryGetComponent(Move)?.moveTo(pointTargetB);
-        // });
 
         gameLayer.addGameObject(cube);
     }
 }
 
-drawArrows(1000);
+drawArrows(100);
 
 
 gameScreen.showFps(true);
