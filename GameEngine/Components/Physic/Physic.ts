@@ -27,7 +27,7 @@ export class Physic extends GameComponent {
         }
         return neighbours;
     }
-    private _NeighboursCount: number = 1;
+    private _NeighboursCount: number = 5;
     private _onNeighboursChange: (gameObject: GameObject, neighbours: GameObject[]) => void;
     private _onCollision: (objectA: GameObject, objectB: GameObject) => void;
     private _Neighbours: GameObject[] = [];

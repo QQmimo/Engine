@@ -22,7 +22,7 @@ const drawObjects = (count: number, size: number = 10): void => {
         generateShaper(cube, Random.Integer(5, 10) * size);
         cube.getComponent(Move).onStart((object, component) => {
             object.Transform.Rotation = Random.Angle();
-            object.getComponent(Shape).drawByDotsCount(Random.Integer(3, 10), Random.Integer(5, 10) * size);
+            object.getComponent(Shape).drawByDotsCount(Random.Integer(3, 10), object.getComponent(Dictionary).get<number>('size'));
             object.getComponent(Shape).FillStyle = { Color: 'green' };
         });
         cube.getComponent(Physic).onCollision((object1, object2) => {
